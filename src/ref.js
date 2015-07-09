@@ -103,6 +103,7 @@ onfire.Ref.prototype.set = function(value){
     return onfire.utils.firebase.set(this.ref_, value).
         then(function(){
             onfire.utils.logging.info('SET (Success) ' + self.path() + ' :', value);
+            return null;
         }, function(err){
             onfire.utils.logging.error('SET (Failure) ' + self.path() + ' :', value, err);
             throw err;
@@ -125,6 +126,7 @@ onfire.Ref.prototype.update = function(values){
     return onfire.utils.firebase.update(this.ref_, values).
         then(function(){
             onfire.utils.logging.info('UPDATE (Success) ' + self.path() + ' :', values);
+            return null;
         }, function(err){
             onfire.utils.logging.error('UPDATE (Failure) ' + self.path() + ' :', values, err);
             throw err;
@@ -151,9 +153,9 @@ onfire.Ref.prototype.transaction = function(updateFn){
     var self = this;
     return onfire.utils.firebase.transaction(this.ref_, updateFn).
         then(function(result){
-            var msg = result.isCommitted ? 'Committed' : 'Not Committed';
+            var msg = result['isCommitted'] ? 'Committed' : 'Not Committed';
             onfire.utils.logging.info('TRANSACTION ' + msg + ' at ' + self.path() + ' :',
-                result.snapshot.val());
+                result['snapshot'].val());
             return result;
         }, function(err){
             onfire.utils.logging.error('TRANSACTION Failed at ' + self.path());
@@ -176,6 +178,7 @@ onfire.Ref.prototype.remove = function(){
     return onfire.utils.firebase.remove(this.ref_).
         then(function(){
             onfire.utils.logging.info('REMOVE (Success) ' + self.path());
+            return null;
         }, function(err){
             onfire.utils.logging.error('REMOVE (Failure) ' + self.path(), err);
             throw err;
@@ -360,5 +363,5 @@ onfire.Ref.prototype.path = function(){
 
     // Only parse the path the first time, then re-use.
     return this.path_ ||
-        (this.path_ = decodeURIComponent(goog.Uri.parse(this.ref_.toString()).getPath()));
+        (this.path_ = decodeURIComponent(goog.Uri.parse(this.ref_.toString()).getPath()) || '/');
 };

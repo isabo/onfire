@@ -25,7 +25,6 @@ if (onfire.utils.detection.IS_NODEJS) {
  *
  * @param {string} path
  * @return {!Firebase}
- * @export
  */
 onfire.utils.firebase.newFirebase = function (path) {
 
@@ -106,7 +105,7 @@ onfire.utils.firebase.update = function(ref, values){
 onfire.utils.firebase.transaction = function(ref, updateFn){
     return onfire.utils.promise.newPromise(function(resolve, reject){
         ref.transaction(updateFn, function(err, isCommitted, snapshot){
-            !err ? resolve({isCommitted: isCommitted, snapshot: snapshot}) : reject(err);
+            !err ? resolve({'isCommitted': isCommitted, 'snapshot': snapshot}) : reject(err);
         }, false);
     });
 };

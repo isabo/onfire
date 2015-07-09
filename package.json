@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/onfire.min.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/tape/bin/tape test/**_test.js | ./node_modules/faucet/bin/cmd.js"
   },
   "repository": {
     "type": "git",
@@ -22,8 +22,16 @@
   },
   "homepage": "https://github.com/isabo/onfire",
   "devDependencies": {
+    "browserify": "^10.2.4",
+    "faucet": "0.0.1",
+    "firebase": "^2.2.7",
     "firebase-externs": "0.0.0",
     "google-closure-compiler": "^20150609.0.0",
-    "google-closure-library": "^20150609.0.0"
+    "google-closure-library": "^20150609.0.0",
+    "mockfirebase": "^0.11.0",
+    "proxyquire": "^1.6.0",
+    "proxyquire-universal": "^1.0.7",
+    "proxyquireify": "^2.1.0",
+    "tape": "^4.0.0"
   }
 }

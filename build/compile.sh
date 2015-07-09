@@ -11,7 +11,7 @@ java -server -jar ../node_modules/google-closure-compiler/compiler.jar \
 --jscomp_warning missingRequire \
 --jscomp_warning useOfGoogBase \
 --generate_exports \
---closure_entry_point onfire.Ref \
+--closure_entry_point onfire \
 --only_closure_dependencies \
 --externs '../node_modules/firebase-externs/firebase-externs.js' \
 --externs '../src/externs/incoming/node-externs.js' \

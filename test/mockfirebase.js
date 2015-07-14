@@ -8,3 +8,4 @@ var onfire = proxyquire('../dist/onfire.min', {
 });
 
 module.exports.MockFirebase = MockFirebase;
+module.exports.onfire = onfire;

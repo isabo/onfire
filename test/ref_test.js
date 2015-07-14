@@ -1,5 +1,6 @@
 var test = require('tape');
 var MockFirebase = require('./mockfirebase').MockFirebase;
+var onfire = require('./mockfirebase').onfire;
 
 
 var fb = new MockFirebase('https://example.firebaseio.com');

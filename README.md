@@ -5,12 +5,12 @@ Here are [more details](https://github.com/isabo/onfire/wiki/OnFire-Goals-&-Requ
 
 ## How to use OnFire in your project
 ### Browser based projects
-* Optional: `bower install [--save] isabo/onfire`
+* Optional: `bower install --save isabo/onfire`
 * Load `onfire.min.js` into your project, after the line that references Firebase. For example:  
   `<script src="./bower_components/onfire/dist/onfire.min.js"></script>`
 
 ### Node.js based projects
-* `npm install [--save] isabo/onfire`
+* `npm install --save isabo/onfire`
 * `var Ref = require('onfire').Ref`
 
 ## How to set up the development environment
@@ -22,5 +22,11 @@ This is not needed if you just want to use OnFire in your project.
   [Node.js](https://nodejs.org/).
 
 ### Dependencies
-* Install: `npm install`
-* Refresh: `npm update`
+* Install the dependencies locally: `npm install`
+* Update the dependencies to the most recent compatible versions: `npm update`
+
+### How To Run the Test Suite
+`npm test`
+
+### How to Build the Distributables
+`./build/compile.sh`

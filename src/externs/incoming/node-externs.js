@@ -14,4 +14,4 @@ module.exports;
  * @param {string} path
  * @return {*}
  */
-var require = function(path){};
+var require = function(path) {};

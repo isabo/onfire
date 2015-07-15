@@ -6,7 +6,7 @@ goog.require('onfire.utils.logging');
 
 
 /**
- * We cannot require onfire.Model without causing a circular reference. This is the
+ * We cannot require onfire.model.Model without causing a circular reference. This is the
  * relevant definition we need here:
  *
  * @typedef {{id: function():string}}
@@ -26,7 +26,7 @@ onfire.triggers.Handler;
  *
  * @constructor
  */
-onfire.triggers.Manager = function(){
+onfire.triggers.Manager = function() {
 
     /**
      * Array of tuples, each consisting of a regular expression, and event type and a handler
@@ -53,7 +53,7 @@ goog.addSingletonGetter(onfire.triggers.Manager);
  *        failure, or return nothing or a promise that resolves when the operation is complete.
  * @param {!Model} context The object that owns the handler, i.e. 'this'.
  */
-onfire.triggers.Manager.prototype.register = function(regexp, eventType, handler, context){
+onfire.triggers.Manager.prototype.register = function(regexp, eventType, handler, context) {
 
     onfire.utils.logging.info('REGISTER_LOCAL_TRIGGER at ' + regexp.toString() + ' on ' +
         eventType.toUpperCase() + ' for ' + context.id());
@@ -66,7 +66,7 @@ onfire.triggers.Manager.prototype.register = function(regexp, eventType, handler
  *
  * @param {!Model} context
  */
-onfire.triggers.Manager.prototype.unregisterContext = function(context){
+onfire.triggers.Manager.prototype.unregisterContext = function(context) {
 
     onfire.utils.logging.info('UNREGISTER_LOCAL_TRIGGERS for ' + context.id());
 
@@ -95,7 +95,7 @@ onfire.triggers.Manager.prototype.unregisterContext = function(context){
  * @return {!Promise<!Array,!Error>|!goog.Promise<!Array,!Error>}
  */
 onfire.triggers.Manager.prototype.trigger = function(ref, eventType, modelOrOldValue,
-        opt_newValue){
+        opt_newValue) {
 
     if (ref === null) {
         return onfire.utils.promise.resolve([null]);
@@ -150,7 +150,7 @@ onfire.triggers.Manager.prototype.trigger = function(ref, eventType, modelOrOldV
  *        failure, or return nothing or a promise that resolves when the operation is complete.
  * @param {!Model} context The object that owns the handler, i.e. 'this'.
  */
-onfire.triggers.register = function(regexp, eventType, handler, context){
+onfire.triggers.register = function(regexp, eventType, handler, context) {
 
     return onfire.triggers.Manager.getInstance().register(regexp, eventType, handler,
         context);
@@ -162,7 +162,7 @@ onfire.triggers.register = function(regexp, eventType, handler, context){
  *
  * @param {!Model} context
  */
-onfire.triggers.unregisterContext = function(context){
+onfire.triggers.unregisterContext = function(context) {
 
     onfire.triggers.Manager.getInstance().unregisterContext(context);
 };
@@ -179,7 +179,7 @@ onfire.triggers.unregisterContext = function(context){
  * @return {!Promise<!Array,!Error>|!goog.Promise<!Array,!Error>}
  * @private
  */
-onfire.triggers.trigger_ = function(ref, eventType, modelOrOldValue, opt_newValue){
+onfire.triggers.trigger_ = function(ref, eventType, modelOrOldValue, opt_newValue) {
 
     return onfire.triggers.Manager.getInstance().trigger(ref, eventType, modelOrOldValue,
         opt_newValue);
@@ -193,7 +193,7 @@ onfire.triggers.trigger_ = function(ref, eventType, modelOrOldValue, opt_newValu
  * @param {!Model|Firebase.Value} child The new child model instance or value.
  * @return {!Promise<!Array,!Error>|!goog.Promise<!Array,!Error>}
  */
-onfire.triggers.triggerChildAdded = function(ref, child){
+onfire.triggers.triggerChildAdded = function(ref, child) {
 
     return onfire.triggers.trigger_(ref, onfire.utils.firebase.EventType.CHILD_ADDED, child);
 };
@@ -206,7 +206,7 @@ onfire.triggers.triggerChildAdded = function(ref, child){
  * @param {!Model|Firebase.Value} child The child model instance or value that was removed.
  * @return {!Promise<!Array,!Error>|!goog.Promise<!Array,!Error>}
  */
-onfire.triggers.triggerChildRemoved = function(ref, child){
+onfire.triggers.triggerChildRemoved = function(ref, child) {
 
     return onfire.triggers.trigger_(ref, onfire.utils.firebase.EventType.CHILD_REMOVED, child);
 };
@@ -220,7 +220,7 @@ onfire.triggers.triggerChildRemoved = function(ref, child){
  * @param {Firebase.Value} newValue The current value at the reference.
  * @return {!Promise<!Array,!Error>|!goog.Promise<!Array,!Error>}
  */
-onfire.triggers.triggerValueChanged = function(ref, oldValue, newValue){
+onfire.triggers.triggerValueChanged = function(ref, oldValue, newValue) {
 
     return onfire.triggers.trigger_(ref, onfire.utils.firebase.EventType.VALUE, oldValue,
         newValue);

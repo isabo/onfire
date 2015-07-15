@@ -26,7 +26,7 @@ if (onfire.utils.detection.IS_NODEJS) {
  * @param {string} path
  * @return {!Firebase}
  */
-onfire.utils.firebase.newFirebase = function (path) {
+onfire.utils.firebase.newFirebase = function(path) {
 
     if (onfire.utils.detection.IS_NODEJS) {
         var fb = onfire.utils.Firebase_;
@@ -44,10 +44,10 @@ onfire.utils.firebase.newFirebase = function (path) {
  * @param {Firebase.Value=} opt_value
  * @return {!Promise<!Firebase,!Error>|!goog.Promise<!Firebase,!Error>}
  */
-onfire.utils.firebase.push = function(ref, opt_value){
-    return onfire.utils.promise.newPromise(function(resolve, reject){
-        if (goog.isDef(opt_value)){
-            var childRef = ref.push(opt_value, function(err){
+onfire.utils.firebase.push = function(ref, opt_value) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        if (goog.isDef(opt_value)) {
+            var childRef = ref.push(opt_value, function(err) {
                 !err ? resolve(childRef) : reject(err);
             });
         } else {
@@ -65,9 +65,9 @@ onfire.utils.firebase.push = function(ref, opt_value){
  * @param {Firebase.Value} value
  * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>}
  */
-onfire.utils.firebase.set = function(ref, value){
-    return onfire.utils.promise.newPromise(function(resolve, reject){
-        ref.set(value, function(err){
+onfire.utils.firebase.set = function(ref, value) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        ref.set(value, function(err) {
             !err ? resolve() : reject(err);
         });
     });
@@ -81,9 +81,9 @@ onfire.utils.firebase.set = function(ref, value){
  * @param {!Object<string,Firebase.Value>} values
  * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>}
  */
-onfire.utils.firebase.update = function(ref, values){
-    return onfire.utils.promise.newPromise(function(resolve, reject){
-        ref.update(values, function(err){
+onfire.utils.firebase.update = function(ref, values) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        ref.update(values, function(err) {
             !err ? resolve() : reject(err);
         });
     });
@@ -102,9 +102,9 @@ onfire.utils.firebase.update = function(ref, values){
         !goog.Promise<!{{isCommitted:boolean,snapshot:Firebase.DataSnapshot}},!Error>
     }
  */
-onfire.utils.firebase.transaction = function(ref, updateFn){
-    return onfire.utils.promise.newPromise(function(resolve, reject){
-        ref.transaction(updateFn, function(err, isCommitted, snapshot){
+onfire.utils.firebase.transaction = function(ref, updateFn) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        ref.transaction(updateFn, function(err, isCommitted, snapshot) {
             !err ? resolve({'isCommitted': isCommitted, 'snapshot': snapshot}) : reject(err);
         }, false);
     });
@@ -117,9 +117,9 @@ onfire.utils.firebase.transaction = function(ref, updateFn){
  * @param {!Firebase} ref
  * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>}
  */
-onfire.utils.firebase.remove = function(ref){
-    return onfire.utils.promise.newPromise(function(resolve, reject){
-        ref.remove(function(err){
+onfire.utils.firebase.remove = function(ref) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        ref.remove(function(err) {
             !err ? resolve() : reject(err);
         });
     });
@@ -133,11 +133,11 @@ onfire.utils.firebase.remove = function(ref){
  * @param {onfire.utils.firebase.EventType} eventType
  * @return {!Promise<!Firebase.DataSnapshot,!Error>|!goog.Promise<!Firebase.DataSnapshot,!Error>}
  */
-onfire.utils.firebase.once = function(ref, eventType){
-    return onfire.utils.promise.newPromise(function(resolve, reject){
-        ref.once(eventType, function(snapshot){
+onfire.utils.firebase.once = function(ref, eventType) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        ref.once(eventType, function(snapshot) {
             resolve(snapshot);
-        }, function(err){
+        }, function(err) {
             reject(err);
         });
     });

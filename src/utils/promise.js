@@ -27,7 +27,7 @@ onfire.utils.promise.IS_IMPLEMENTED_ = (typeof Promise !== 'undefined');
  */
 onfire.utils.promise.newPromise = function(resolver) {
 
-    if (onfire.utils.promise.IS_IMPLEMENTED_){
+    if (onfire.utils.promise.IS_IMPLEMENTED_) {
         return new Promise(resolver);
     } else {
         return new goog.Promise(resolver);
@@ -44,7 +44,7 @@ onfire.utils.promise.newPromise = function(resolver) {
  */
 onfire.utils.promise.resolve = function(value) {
 
-    if (onfire.utils.promise.IS_IMPLEMENTED_){
+    if (onfire.utils.promise.IS_IMPLEMENTED_) {
         return Promise.resolve(value);
     } else {
         return goog.Promise.resolve(value);
@@ -60,7 +60,7 @@ onfire.utils.promise.resolve = function(value) {
  */
 onfire.utils.promise.reject = function(err) {
 
-    if (onfire.utils.promise.IS_IMPLEMENTED_){
+    if (onfire.utils.promise.IS_IMPLEMENTED_) {
         return Promise.reject(err);
     } else {
         return goog.Promise.reject(err);
@@ -77,7 +77,7 @@ onfire.utils.promise.reject = function(err) {
  */
 onfire.utils.promise.all = function(promises) {
 
-    if (onfire.utils.promise.IS_IMPLEMENTED_){
+    if (onfire.utils.promise.IS_IMPLEMENTED_) {
         return Promise.all(promises);
     } else {
         return goog.Promise.all(/** @type {!Array<!goog.Thenable<?>>}*/(promises));

@@ -1,5 +1,6 @@
 goog.provide('onfire.model.Model');
 
+goog.require('onfire.Ref');
 goog.require('onfire.model.config');
 goog.require('onfire.utils.promise');
 goog.require('onfire.utils.logging');
@@ -15,6 +16,10 @@ goog.require('goog.object');
  * @export
  */
 onfire.model.Model = function(ref) {
+
+    if (!(ref instanceof onfire.Ref)) {
+        throw new Error('ref argument must be an onfire.Ref instance');
+    }
 
     /**
      * @type {!onfire.Ref}
@@ -77,7 +82,7 @@ onfire.model.Model = function(ref) {
      * @type {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>}
      * @private
      */
-    this.loadPromise_ = this.startMonitoring();
+    this.loadPromise_ = this.startMonitoring_();
 };
 
 
@@ -168,9 +173,9 @@ onfire.model.Model.prototype.configureInstance = function(config) {
  * Load the initial data and watch for changes.
  *
  * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>}
- * @protected
+ * @private
  */
-onfire.model.Model.prototype.startMonitoring = function() {
+onfire.model.Model.prototype.startMonitoring_ = function() {
 
     var self = this;
     return onfire.utils.promise.newPromise(function(resolve, reject) {
@@ -210,6 +215,7 @@ onfire.model.Model.prototype.stopMonitoring_ = function() {
  * Return a promise that is resolved to this instance when the data has been loaded.
  *
  * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>}
+ * @export
  */
 onfire.model.Model.prototype.whenLoaded = function() {
 

@@ -12,7 +12,7 @@ test('Fails with invalid property type', function (t) {
     };
 
     t.throws(function () {
-        onfire.modelling.generateConstructor(cfg);
+        onfire.generateConstructor(cfg);
     }, 'Throws an error');
 
     t.end();
@@ -22,7 +22,7 @@ test('Fails with invalid property type', function (t) {
 test('Fails with invalid config value', function (t) {
 
     t.throws(function () {
-        onfire.modelling.generateConstructor('This is not a config');
+        onfire.generateConstructor('This is not a config');
     }, 'Throws an error');
 
     t.end();
@@ -37,9 +37,9 @@ test('Generates a simple model constructor', function (t) {
         boolean: 'boolean'
     };
 
-    var Model = onfire.modelling.generateConstructor(cfg);
+    var Model = onfire.generateConstructor(cfg);
 
-    t.ok(Model.prototype instanceof onfire.Model, 'Constructs subclass of onfire.Model');
+    t.ok(Model.prototype instanceof onfire.model.Model, 'Constructs subclass of onfire.model.Model');
 
     // Check for property getters/setters.
     for (var p in cfg) {
@@ -55,10 +55,10 @@ test('Generates a simple collection constructor', function (t) {
         $id: 'boolean'
     };
 
-    var Collection = onfire.modelling.generateConstructor(cfg);
+    var Collection = onfire.generateConstructor(cfg);
 
-    t.ok(Collection.prototype instanceof onfire.Collection,
-        'Constructs subclass of onfire.Collection');
+    t.ok(Collection.prototype instanceof onfire.model.Collection,
+        'Constructs subclass of onfire.model.Collection');
     t.end();
 });
 
@@ -75,7 +75,7 @@ test('Generates nested constructors for submodels', function (t) {
         }
     };
 
-    var Model = onfire.modelling.generateConstructor(cfg);
+    var Model = onfire.generateConstructor(cfg);
 
     for (var p in cfg) {
         t.equal(typeof Model.prototype[p], 'function', 'Has method ' + p + '()');
@@ -95,7 +95,7 @@ test('Uses pre-generated constructors for submodels', function (t) {
     var itemsCfg = {
         $id: 'boolean'
     };
-    var ItemsCollection = onfire.modelling.generateConstructor(itemsCfg);
+    var ItemsCollection = onfire.generateConstructor(itemsCfg);
 
     var cfg = {
         details: {
@@ -105,7 +105,7 @@ test('Uses pre-generated constructors for submodels', function (t) {
         items: ItemsCollection
     };
 
-    var Model = onfire.modelling.generateConstructor(cfg);
+    var Model = onfire.generateConstructor(cfg);
 
     for (var p in cfg) {
         t.equal(typeof Model.prototype[p], 'function', 'Has method ' + p + '()');

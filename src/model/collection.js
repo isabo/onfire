@@ -1,6 +1,6 @@
-goog.provide('onfire.Collection');
+goog.provide('onfire.model.Collection');
 
-goog.require('onfire.Model');
+goog.require('onfire.model.Model');
 goog.require('onfire.triggers');
 goog.require('onfire.utils.promise');
 goog.require('goog.object');
@@ -10,33 +10,33 @@ goog.require('goog.object');
  * Base class for collections (object maps) that live in Firebase.
  *
  * @param {!onfire.Ref} ref The reference of the current object.
- * @param {!function(new:onfire.Model, !onfire.Ref, number=)=} opt_memberCtor The constructor to
+ * @param {!function(new:onfire.model.Model, !onfire.Ref, number=)=} opt_memberCtor The constructor to
  *      use for instances of collection members.
  * @constructor
- * @extends {onfire.Model}
+ * @extends {onfire.model.Model}
  * @template T
  * @export
  */
-onfire.Collection = function(ref, opt_memberCtor){
+onfire.model.Collection = function(ref, opt_memberCtor) {
 
-    onfire.Collection.base(this, 'constructor', ref);
+    onfire.model.Collection.base(this, 'constructor', ref);
 
     /**
      * Any members should be instantiated with this constructor.
      *
-     * @type {!function(new:onfire.Model, !onfire.Ref, number=)}
+     * @type {!function(new:onfire.model.Model, !onfire.Ref, number=)}
      * @private
      */
-    this.memberCtor_ = opt_memberCtor || onfire.Model;
+    this.memberCtor_ = opt_memberCtor || onfire.model.Model;
 };
-goog.inherits(onfire.Collection, onfire.Model);
+goog.inherits(onfire.model.Collection, onfire.model.Model);
 
 
 /**
  * @override the return type.
- * @return {!Promise<!onfire.Collection,!Error>|!goog.Promise<!onfire.Collection,!Error>}
+ * @return {!Promise<!onfire.model.Collection,!Error>|!goog.Promise<!onfire.model.Collection,!Error>}
  */
-onfire.Collection.prototype.whenLoaded;
+onfire.model.Collection.prototype.whenLoaded;
 
 
 // TODO: should we change the visibility of this to protected?
@@ -44,17 +44,17 @@ onfire.Collection.prototype.whenLoaded;
  * @override the return type.
  * @param {string} propertyName The name of a property.
  * @param {Firebase.Value} value The primitive value to assign to the property.
- * @return {!onfire.Collection}
+ * @return {!onfire.model.Collection}
  */
-onfire.Collection.prototype.set;
+onfire.model.Collection.prototype.set;
 
 
 // TODO: should we change the visibility of this to protected?
 /**
  * @override the return type.
- * @return {!onfire.Collection}
+ * @return {!onfire.model.Collection}
  */
-onfire.Collection.prototype.save;
+onfire.model.Collection.prototype.save;
 
 
 // TODO: should we change the visibility of this to protected?
@@ -62,10 +62,10 @@ onfire.Collection.prototype.save;
  * @override the return type.
  * @param {!Object<string,Firebase.Value>} pairs An object containing the property/value pairs to
  *        update.
- * @return {!onfire.Collection}
+ * @return {!onfire.model.Collection}
  * @protected
  */
-onfire.Collection.prototype.update;
+onfire.model.Collection.prototype.update;
 
 
 /**
@@ -75,7 +75,7 @@ onfire.Collection.prototype.update;
  * @return {!Promise<!T,!Error>|!goog.Promise<!T,!Error>}
  * @export
  */
-onfire.Collection.prototype.fetchItem = function(id){
+onfire.model.Collection.prototype.fetchItem = function(id) {
 
     var item = new this.memberCtor_(this.ref.child(id));
     return item.whenLoaded();
@@ -90,12 +90,12 @@ onfire.Collection.prototype.fetchItem = function(id){
  * @return {!Promise<!T,!Error>|!goog.Promise<!T,!Error>}
  * @export
  */
-onfire.Collection.prototype.createItem = function (opt_values) {
+onfire.model.Collection.prototype.createItem = function(opt_values) {
 
     var id = this.ref.generateId();
     var p = this.fetchItem(id);
     if (opt_values) {
-        p = p.then(function (/** !onfire.Model */item) {
+        p = p.then(function(/** !onfire.model.Model */item) {
             return item.update(/** @type {!Object<string,Firebase.Value>} */(opt_values));
         });
     }
@@ -113,15 +113,15 @@ onfire.Collection.prototype.createItem = function (opt_values) {
  * @return {!Promise<!T,!Error>|!goog.Promise<!T,!Error>}
  * @export
  */
-onfire.Collection.prototype.fetchOrCreateItem = function(id, values){
+onfire.model.Collection.prototype.fetchOrCreateItem = function(id, values) {
 
     return this.fetchItem(id).
-        then(function(/** !onfire.Model */item){
+        then(function(/** !onfire.model.Model */item) {
 
             if (values) {
 
                 return item.initializeValues(values).
-                    then(function(){
+                    then(function() {
                         return item;
                     });
 
@@ -139,21 +139,21 @@ onfire.Collection.prototype.fetchOrCreateItem = function(id, values){
  * @return {!Promise|!goog.Promise}
  * @export
  */
-onfire.Collection.prototype.removeItem = function(id){
+onfire.model.Collection.prototype.removeItem = function(id) {
 
     var removed;
     var self = this;
     return this.fetchItem(id).
-        then(function(item){
+        then(function(item) {
             removed = item;
         }).
-        then(function(){
+        then(function() {
             return self.set(id, null);
         }).
-        then(function(){
+        then(function() {
             return onfire.triggers.triggerChildRemoved(self.ref, removed);
         }).
-        then(function(){
+        then(function() {
             removed.dispose();
         });
 };
@@ -162,17 +162,17 @@ onfire.Collection.prototype.removeItem = function(id){
 /**
  * Perform an operation on each member of the collection.
  *
- * @param {!function(!onfire.Model, string=):(!Promise|!goog.Promise|undefined)} callback
+ * @param {!function(!onfire.model.Model, string=):(!Promise|!goog.Promise|undefined)} callback
  * @return {(!Promise|!goog.Promise)}
  * @export
  */
-onfire.Collection.prototype.forEach = function(callback){
+onfire.model.Collection.prototype.forEach = function(callback) {
 
     var promises = [];
     for (var id in this.storageObj) {
 
         var p = this.fetchItem(id).
-            then(function (item) {
+            then(function(item) {
                 return callback.call(null, item, id);
             });
         promises.push(p);
@@ -188,7 +188,7 @@ onfire.Collection.prototype.forEach = function(callback){
  * @return {number}
  * @export
  */
-onfire.Collection.prototype.count = function(){
+onfire.model.Collection.prototype.count = function() {
 
     return this.childrenCount;
 };
@@ -200,7 +200,7 @@ onfire.Collection.prototype.count = function(){
  * @return {!Array<string>}
  * @export
  */
-onfire.Collection.prototype.ids = function(){
+onfire.model.Collection.prototype.ids = function() {
 
     return goog.object.getKeys(this.storageObj);
 };
@@ -212,7 +212,7 @@ onfire.Collection.prototype.ids = function(){
  * @param {!Firebase.DataSnapshot} snapshot
  * @private
  */
-onfire.Collection.prototype.handleChildAdded_ = function(snapshot){
+onfire.model.Collection.prototype.handleChildAdded_ = function(snapshot) {
 
     if (!this.storageObj) {
         this.storageObj = {};
@@ -229,7 +229,7 @@ onfire.Collection.prototype.handleChildAdded_ = function(snapshot){
  * @param {!Firebase.DataSnapshot} snapshot
  * @private
  */
-onfire.Collection.prototype.handleChildRemoved_ = function(snapshot){
+onfire.model.Collection.prototype.handleChildRemoved_ = function(snapshot) {
 
     delete this.storageObj[snapshot.key()];
 

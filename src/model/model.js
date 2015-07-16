@@ -333,7 +333,7 @@ onfire.model.Model.prototype.save = function() {
 
     if (this.hasChanges_) {
         return this.update(this.changes).
-            then(function(self) {
+            then(function(/** !onfire.model.Model */self) {
                 // Reset the changes.
                 self.changes = {};
                 self.hasChanges_ = false;
@@ -426,7 +426,7 @@ onfire.model.Model.prototype.initializeValues = function(values) {
             return values;
         }
     }).
-    then(function(result) {
+    then(function(/** !Object */result) {
         if (result['isCommitted']) {
             onfire.utils.logging.info('CREATED ' + self.ref.path());
             return onfire.triggers.triggerChildAdded(self.ref.parent(), self).

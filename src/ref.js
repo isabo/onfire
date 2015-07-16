@@ -65,7 +65,7 @@ onfire.Ref.prototype.push = function(opt_value) {
 
     var self = this;
     return onfire.utils.firebase.push(this.ref_, opt_value).
-        then(function(ref) {
+        then(function(/** !Firebase */ref) {
             onfire.utils.logging.info('PUSH (Success) ' + self.path() + ' :', opt_value);
             return new onfire.Ref(ref);
         }, function(err) {
@@ -152,7 +152,7 @@ onfire.Ref.prototype.transaction = function(updateFn) {
 
     var self = this;
     return onfire.utils.firebase.transaction(this.ref_, updateFn).
-        then(function(result) {
+        then(function(/** !Object */result) {
             var msg = result['isCommitted'] ? 'Committed' : 'Not Committed';
             onfire.utils.logging.info('TRANSACTION ' + msg + ' at ' + self.path() + ' :',
                 result['snapshot'].val());
@@ -199,7 +199,7 @@ onfire.Ref.prototype.once = function(eventType) {
 
     var self = this;
     return onfire.utils.firebase.once(this.ref_, eventType).
-        then(function(snapshot) {
+        then(function(/** !Firebase.DataSnapshot */snapshot) {
             onfire.utils.logging.info('ONCE ' + eventType.toUpperCase() +  ' (Success) ' +
                 self.path(), snapshot.val());
             return snapshot;

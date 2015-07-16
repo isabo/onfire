@@ -136,7 +136,8 @@ onfire.model.factory.configureCtor_ = function(ctor, schema) {
                 if (ctor.prototype[name] === undefined) {
                     ctor.prototype[name] = onfire.model.factory.generateGetterSetter_(name);
                 } else {
-                    onfire.utils.logging.warn(name + ' clashes with a built-in property or method. ' +
+                    onfire.utils.logging.warn(name +
+                        ' clashes with a built-in property or method. ' +
                         'Use the generic .get(' + name + ') / .set(' + name +
                         ', value) methods to access this property.');
                 }
@@ -156,7 +157,8 @@ onfire.model.factory.configureCtor_ = function(ctor, schema) {
                 if (ctor.prototype[name] === undefined) {
                     ctor.prototype[name] = onfire.model.factory.generateGetter_(name);
                 } else {
-                    onfire.utils.logging.warn(name + ' clashes with a built-in property or method. ' +
+                    onfire.utils.logging.warn(name +
+                        ' clashes with a built-in property or method. ' +
                         'Use the generic .getModel(' + name + ') method to access this property.');
                 }
                 break;

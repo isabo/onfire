@@ -10,8 +10,8 @@ goog.require('goog.object');
  * Base class for collections (object maps) that live in Firebase.
  *
  * @param {!onfire.Ref} ref The reference of the current object.
- * @param {!function(new:onfire.model.Model, !onfire.Ref, number=)=} opt_memberCtor The constructor to
- *      use for instances of collection members.
+ * @param {!function(new:onfire.model.Model, !onfire.Ref, number=)=} opt_memberCtor The constructor
+ *      to use for instances of collection members.
  * @constructor
  * @extends {onfire.model.Model}
  * @template T

@@ -298,7 +298,8 @@ onfire.Ref.prototype.onValue = function(callback, cancelCallback, context) {
         callback.call(context, snapshot.val());
     };
 
-    return this.on(onfire.utils.firebase.EventType.VALUE, unwrapAndCallBack, cancelCallback, context);
+    return this.on(onfire.utils.firebase.EventType.VALUE, unwrapAndCallBack, cancelCallback,
+        context);
 };
 
 

@@ -1,7 +1,7 @@
 goog.provide('onfire.model.Model');
 
 goog.require('onfire.Ref');
-goog.require('onfire.model.config');
+goog.require('onfire.model.schema');
 goog.require('onfire.utils.promise');
 goog.require('onfire.utils.logging');
 goog.require('onfire.triggers');
@@ -61,12 +61,12 @@ onfire.model.Model = function(ref) {
     this.childrenCount = 0;
 
     /**
-     * The configuration object used to generate this instance.
+     * The schema object used to generate this instance.
      *
      * @type {Object}
      * @protected
      */
-    this.config = null;
+    this.schema = null;
 
     /**
      * Instances of subordinate models to dispose.
@@ -109,38 +109,38 @@ onfire.model.Model.prototype.dispose = function() {
 
 
 /**
- * Adds properties and subordinate model instances to the current instance, based on its
- * configuration object. This is called by generated subclasses of onfire.model.Model.
+ * Adds properties and subordinate model instances to the current instance, based on its schema
+ * object. This is called by generated subclasses of onfire.model.Model.
  *
- * @param {!Object} config
+ * @param {!Object} schema
  * @package
  */
-onfire.model.Model.prototype.configureInstance = function(config) {
+onfire.model.Model.prototype.configureInstance = function(schema) {
 
-    this.config = config;
+    this.schema = schema;
 
     var promises = [];
 
-    for (var name in this.config) {
+    for (var name in this.schema) {
 
-        var rhs = this.config[name];
+        var rhs = this.schema[name];
         var ctor;
-        var valueType = onfire.model.config.determineValueType(rhs);
+        var valueType = onfire.model.schema.determineValueType(rhs);
 
         switch (valueType) {
 
-            case onfire.model.config.ValueType.STRING:
-            case onfire.model.config.ValueType.NUMBER:
-            case onfire.model.config.ValueType.BOOLEAN:
+            case onfire.model.schema.ValueType.STRING:
+            case onfire.model.schema.ValueType.NUMBER:
+            case onfire.model.schema.ValueType.BOOLEAN:
 
                 // A primitive type name.
                 // A getter/setter has already been configured on the prototype.
                 break;
 
-            case onfire.model.config.ValueType.MODEL:
-            case onfire.model.config.ValueType.COLLECTION:
+            case onfire.model.schema.ValueType.MODEL:
+            case onfire.model.schema.ValueType.COLLECTION:
 
-                // The value is the config for a subordinate model.
+                // The value is the schema for a subordinate model.
                 // Create the appropriate model or collection instance from the constructor that
                 // was generated during the definition phase.
                 ctor = this[name + onfire.model.Model.CONSTRUCTOR_SUFFIX];

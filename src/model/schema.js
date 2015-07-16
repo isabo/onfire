@@ -1,30 +1,30 @@
-goog.provide('onfire.model.config');
+goog.provide('onfire.model.schema');
 
 
 /**
- * Determine the type of the provided value, taken from the right-hand-side of a config property.
+ * Determine the type of the provided value, taken from the right-hand-side of a schema property.
  * Does it represent a primitive, model or collection?
  *
  * @param {string|!Object|!function(new:onfire.model.Model, !onfire.Ref)} value
- * @return {onfire.model.config.ValueType}
+ * @return {onfire.model.schema.ValueType}
  * @package
  */
-onfire.model.config.determineValueType = function(value) {
+onfire.model.schema.determineValueType = function(value) {
 
     switch (typeof value) {
 
         case 'function':
-            return onfire.model.config.ValueType.CONSTRUCTOR;
+            return onfire.model.schema.ValueType.CONSTRUCTOR;
 
         case 'object':
             // Detect the presence of an $id key.
             var idValue = value['$id'];
             if (goog.isDef(idValue)) {
                 // The current value is an object that contains an $id key, i.e. a collection.
-                return onfire.model.config.ValueType.COLLECTION;
+                return onfire.model.schema.ValueType.COLLECTION;
             } else {
                 // There is no $id key --> use a regular model.
-                return onfire.model.config.ValueType.MODEL;
+                return onfire.model.schema.ValueType.MODEL;
             }
     }
 
@@ -33,16 +33,16 @@ onfire.model.config.determineValueType = function(value) {
     switch (value) {
 
         case 'string':
-            return onfire.model.config.ValueType.STRING;
+            return onfire.model.schema.ValueType.STRING;
 
         case 'number':
-            return onfire.model.config.ValueType.NUMBER;
+            return onfire.model.schema.ValueType.NUMBER;
 
         case 'boolean':
-            return onfire.model.config.ValueType.BOOLEAN;
+            return onfire.model.schema.ValueType.BOOLEAN;
 
         default:
-            return onfire.model.config.ValueType.UNKNOWN;
+            return onfire.model.schema.ValueType.UNKNOWN;
     }
 };
 
@@ -51,7 +51,7 @@ onfire.model.config.determineValueType = function(value) {
  * @enum {number}
  * @package
  */
-onfire.model.config.ValueType = {
+onfire.model.schema.ValueType = {
     STRING: 0,
     NUMBER: 1,
     BOOLEAN: 2,

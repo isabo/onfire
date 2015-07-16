@@ -1,48 +1,48 @@
-goog.provide('onfire.model.generator');
+goog.provide('onfire.model.factory');
 
-goog.require('onfire.model.config');
+goog.require('onfire.model.schema');
 goog.require('onfire.model.Model');
 goog.require('onfire.model.Collection');
 
 
 /**
- * Generate a subclass of onfire.model.Model or onfire.model.Collection with a baked in
- * configuration.
+ * Generate a subclass of onfire.model.Model or onfire.model.Collection with a baked in schema.
  *
- * @param {!Object|!function(new:onfire.model.Model, !onfire.Ref)} configOrCtor A configuration
- *      object or a reference to a predefined Model subclass constructor.
+ * @param {!Object|!function(new:onfire.model.Model, !onfire.Ref)} schemaOrCtor A schema object or
+ *      a reference to a predefined Model subclass constructor.
  * @return {!function(new:onfire.model.Model, !onfire.Ref)}
  */
-onfire.model.generator.generateConstructor = function(configOrCtor) {
+onfire.model.factory.defineModel = function(schemaOrCtor) {
 
-    switch (typeof configOrCtor) {
+    switch (typeof schemaOrCtor) {
 
         case 'function':
-            return configOrCtor;
+            return schemaOrCtor;
 
         case 'object':
             break;
 
         default:
-            throw new Error('Invalid config - it must be an object or a constructor!');
+            throw new Error('Invalid schema - it must be an object or a constructor!');
     }
 
     // It's an object. Does it represent a collection?
-    if (onfire.model.config.determineValueType(configOrCtor) === onfire.model.config.ValueType.COLLECTION) {
-        return onfire.model.generator.generateCollectionCtor_(configOrCtor);
+    if (onfire.model.schema.determineValueType(schemaOrCtor) ===
+            onfire.model.schema.ValueType.COLLECTION) {
+        return onfire.model.factory.generateCollectionCtor_(schemaOrCtor);
     } else {
-        return onfire.model.generator.generateModelCtor_(configOrCtor);
+        return onfire.model.factory.generateModelCtor_(schemaOrCtor);
     }
 };
 
 
 /**
- * Generate a subclass of onfire.model.Model with a baked in configuration.
+ * Generate a subclass of onfire.model.Model with a baked in schema.
  *
- * @param {!Object} config
+ * @param {!Object} schema
  * @return {!function(new:onfire.model.Model, !onfire.Ref)}
  */
-onfire.model.generator.generateModelCtor_ = function(config) {
+onfire.model.factory.generateModelCtor_ = function(schema) {
 
     /**
      * @constructor
@@ -51,46 +51,46 @@ onfire.model.generator.generateModelCtor_ = function(config) {
     var Model = function(ref) {
         Model.base(this, 'constructor', ref);
         // Instantiate models to represent any non-primitive properties.
-        this.configureInstance(config);
+        this.configureInstance(schema);
     };
     goog.inherits(Model, onfire.model.Model);
 
     // Add prototype methods and generate subordinate constructors.
-    onfire.model.generator.configureCtor_(Model, config);
+    onfire.model.factory.configureCtor_(Model, schema);
 
     return Model;
 };
 
 
 /**
- * Generate a subclass of onfire.model.Collection with a baked in configuration.
+ * Generate a subclass of onfire.model.Collection with a baked in schema.
  *
- * @param {{$id:(string|!Object|!function(new:onfire.model.Model))}} config
+ * @param {{$id:(string|!Object|!function(new:onfire.model.Model))}} schema
  * @return {!function(new:onfire.model.Model, !onfire.Ref)}
  * @private
  */
-onfire.model.generator.generateCollectionCtor_ = function(config) {
+onfire.model.factory.generateCollectionCtor_ = function(schema) {
 
     // Collection members may be primitives or models.
-    // Prepare a class with a baked in configuration, to be used for instantiating collection
+    // Prepare a class with a baked in schema, to be used for instantiating collection
     // members if they are not primitives.
-    var memberConfig = config['$id'];
-    var type = onfire.model.config.determineValueType(memberConfig);
+    var memberSchema = schema['$id'];
+    var type = onfire.model.schema.determineValueType(memberSchema);
     var memberCtor;
 
     switch (type) {
-        case onfire.model.config.ValueType.STRING:
-        case onfire.model.config.ValueType.NUMBER:
-        case onfire.model.config.ValueType.BOOLEAN:
+        case onfire.model.schema.ValueType.STRING:
+        case onfire.model.schema.ValueType.NUMBER:
+        case onfire.model.schema.ValueType.BOOLEAN:
             break;
 
-        case onfire.model.config.ValueType.CONSTRUCTOR:
-            memberCtor = memberConfig;
+        case onfire.model.schema.ValueType.CONSTRUCTOR:
+            memberCtor = memberSchema;
             break;
 
-        case onfire.model.config.ValueType.MODEL:
-        case onfire.model.config.ValueType.COLLECTION:
-            memberCtor = onfire.model.generator.generateModelCtor_(memberConfig);
+        case onfire.model.schema.ValueType.MODEL:
+        case onfire.model.schema.ValueType.COLLECTION:
+            memberCtor = onfire.model.factory.generateModelCtor_(memberSchema);
             break;
 
         default:
@@ -112,29 +112,29 @@ onfire.model.generator.generateCollectionCtor_ = function(config) {
 
 
 /**
- * Adds properties and subordinate model prototypes to a model constructor, based on a configuration
+ * Adds properties and subordinate model prototypes to a model constructor, based on a schema
  * object.
  *
  * @param {!function(new:onfire.model.Model, !onfire.Ref)} ctor
- * @param {!Object} config
+ * @param {!Object} schema
  * @private
  */
-onfire.model.generator.configureCtor_ = function(ctor, config) {
+onfire.model.factory.configureCtor_ = function(ctor, schema) {
 
-    for (var name in config) {
+    for (var name in schema) {
 
-        var rhs = config[name];
-        var valueType = onfire.model.config.determineValueType(rhs);
+        var rhs = schema[name];
+        var valueType = onfire.model.schema.determineValueType(rhs);
 
         switch (valueType) {
 
-            case onfire.model.config.ValueType.STRING:
-            case onfire.model.config.ValueType.NUMBER:
-            case onfire.model.config.ValueType.BOOLEAN:
+            case onfire.model.schema.ValueType.STRING:
+            case onfire.model.schema.ValueType.NUMBER:
+            case onfire.model.schema.ValueType.BOOLEAN:
 
                 // A primitive type name. Add a get/set method for it.
                 if (ctor.prototype[name] === undefined) {
-                    ctor.prototype[name] = onfire.model.generator.generateGetterSetter_(name);
+                    ctor.prototype[name] = onfire.model.factory.generateGetterSetter_(name);
                 } else {
                     onfire.utils.logging.warn(name + ' clashes with a built-in property or method. ' +
                         'Use the generic .get(' + name + ') / .set(' + name +
@@ -142,19 +142,19 @@ onfire.model.generator.configureCtor_ = function(ctor, config) {
                 }
                 break;
 
-            case onfire.model.config.ValueType.CONSTRUCTOR:
-            case onfire.model.config.ValueType.MODEL:
-            case onfire.model.config.ValueType.COLLECTION:
+            case onfire.model.schema.ValueType.CONSTRUCTOR:
+            case onfire.model.schema.ValueType.MODEL:
+            case onfire.model.schema.ValueType.COLLECTION:
 
-                // The value is the config for a subordinate model.
+                // The value is the schema for a subordinate model.
 
                 // Generate a constructor for the appropriate model or collection.
                 ctor.prototype[name + onfire.model.Model.CONSTRUCTOR_SUFFIX] =
-                    onfire.model.generator.generateConstructor(rhs);
+                    onfire.model.factory.defineModel(rhs);
 
                 // Add a getter for it.
                 if (ctor.prototype[name] === undefined) {
-                    ctor.prototype[name] = onfire.model.generator.generateGetter_(name);
+                    ctor.prototype[name] = onfire.model.factory.generateGetter_(name);
                 } else {
                     onfire.utils.logging.warn(name + ' clashes with a built-in property or method. ' +
                         'Use the generic .getModel(' + name + ') method to access this property.');
@@ -175,7 +175,7 @@ onfire.model.generator.configureCtor_ = function(ctor, config) {
  * @return {function(Firebase.Value=):(Firebase.Value|onfire.model.Model|null)}
  * @private
  */
-onfire.model.generator.generateGetterSetter_ = function(propertyName) {
+onfire.model.factory.generateGetterSetter_ = function(propertyName) {
 
     /**
      * @this {onfire.model.Model}
@@ -202,7 +202,7 @@ onfire.model.generator.generateGetterSetter_ = function(propertyName) {
  * @return {function():Firebase.Value}
  * @private
  */
-onfire.model.generator.generateGetter_ = function(propertyName) {
+onfire.model.factory.generateGetter_ = function(propertyName) {
 
     /**
      * @this {onfire.model.Model}

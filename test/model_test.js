@@ -5,15 +5,15 @@ var onfire = require('./mockfirebase').onfire;
 var rootRef = new MockFirebase('https://example.firebaseio.com');
 
 
-test('Simple model reads its own data', function (t) {
+test('Simple model', function (t) {
 
     // Prepare the constructor.
-    var cfg = {
+    var schema = {
         number: 'number',
         string: 'string',
         boolean: 'boolean'
     };
-    var Thing = onfire.generateConstructor(cfg);
+    var Thing = onfire.defineModel(schema);
 
     // Prepare the database.
     var ref = rootRef.child('simpleModel');

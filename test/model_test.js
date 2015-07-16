@@ -34,7 +34,7 @@ test('Simple model', function (t) {
         }
 
         // Test basic properties.
-        t.equal(thing.key(), 'simpleModel', '.key() property works');
+        t.equal(thing.key(), ref.key(), '.key() property works');
         t.equal(thing.exists(), false, '.exists() is false before loading');
         t.equal(thing.hasChanges(), false, '.hasChanges() is false before loading');
 

@@ -394,7 +394,7 @@ onfire.model.Model.prototype.update = function(pairs) {
             if (oldCount > 0 && self.childrenCount === 0) {
                 // This object just disappeared because we set its remaining properties to null.
                 onfire.utils.logging.info('REMOVED ' + self.ref.path());
-                return onfire.triggers.triggerChildRemoved(self.ref.parent(), self);
+                return onfire.triggers.triggerChildRemoved(self.ref.parent(), self, self.key());
             } else if (oldCount === 0 && self.childrenCount > 0) {
                 // This object just came back into existence.
                 onfire.utils.logging.info('CREATED ' + self.ref.path());

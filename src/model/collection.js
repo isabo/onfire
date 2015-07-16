@@ -24,10 +24,10 @@ onfire.model.Collection = function(ref, opt_memberCtor) {
     /**
      * Any members should be instantiated with this constructor.
      *
-     * @type {!function(new:onfire.model.Model, !onfire.Ref, number=)}
+     * @type {function(new:onfire.model.Model, !onfire.Ref, number=)|undefined}
      * @private
      */
-    this.memberCtor_ = opt_memberCtor || onfire.model.Model;
+    this.memberCtor_ = opt_memberCtor;
 };
 goog.inherits(onfire.model.Collection, onfire.model.Model);
 
@@ -37,6 +37,45 @@ goog.inherits(onfire.model.Collection, onfire.model.Model);
  * @return {!Promise<!onfire.model.Collection,!Error>|!goog.Promise<!onfire.model.Collection,!Error>}
  */
 onfire.model.Collection.prototype.whenLoaded;
+
+
+/**
+ * Get the value corresponding to an ID. If the value is a model, it is better to call .fetch()
+ * which returns a promise that resolves when the model is fully loaded and ready to use.
+ *
+ * @override
+ * @param {string} key An key of an item in the collection.
+ * @return {Firebase.Value|onfire.model.Model}
+ * @export
+ */
+onfire.model.Collection.prototype.get = function(key) {
+
+    return this.memberCtor_ ? this.getModel(key) : this.getBasicValue(key);
+};
+
+
+/**
+ * Return a model instance to represent the item whose ID is provided. Note that the model will
+ * only be ready to use once its .whenLoaded() promise has resolved. In most cases, it would be
+ * easier to call .fetch() which is shorthand for the above.
+ *
+ * @param {string} key The key of the desired item.
+ * @return {!onfire.model.Model}
+ * @export
+ */
+onfire.model.Collection.prototype.getModel = function(key) {
+
+    // TODO: validate that we have such an item.
+    if (this.memberCtor_) {
+        if (this.containsKey(key)) {
+            return new this.memberCtor_(this.ref.child(key));
+        } else {
+            throw new Error('No such key in the collection.');
+        }
+    } else {
+        throw new Error('Cannot create a model for a primitive value');
+    }
+};
 
 
 // TODO: should we change the visibility of this to protected?
@@ -57,7 +96,6 @@ onfire.model.Collection.prototype.set;
 onfire.model.Collection.prototype.save;
 
 
-// TODO: should we change the visibility of this to protected?
 /**
  * @override the return type.
  * @param {!Object<string,Firebase.Value>} pairs An object containing the property/value pairs to
@@ -71,14 +109,13 @@ onfire.model.Collection.prototype.update;
 /**
  * Instantiate a specified item.
  *
- * @param {string} id The ID of the member.
+ * @param {string} key The key of the member.
  * @return {!Promise<!T,!Error>|!goog.Promise<!T,!Error>}
  * @export
  */
-onfire.model.Collection.prototype.fetchItem = function(id) {
+onfire.model.Collection.prototype.fetch = function(key) {
 
-    var item = new this.memberCtor_(this.ref.child(id));
-    return item.whenLoaded();
+    return this.getModel(key).whenLoaded();
 };
 
 
@@ -90,10 +127,15 @@ onfire.model.Collection.prototype.fetchItem = function(id) {
  * @return {!Promise<!T,!Error>|!goog.Promise<!T,!Error>}
  * @export
  */
-onfire.model.Collection.prototype.createItem = function(opt_values) {
+onfire.model.Collection.prototype.create = function(opt_values) {
 
-    var id = this.ref.generateId();
-    var p = this.fetchItem(id);
+    if (!this.memberCtor_) {
+        throw new Error('.create() is for creating models, not primitive values');
+    }
+
+    var key = this.ref.generateId();
+    var model = new this.memberCtor_(this.ref.child(key));
+    var p = model.whenLoaded();
     if (opt_values) {
         p = p.then(function(/** !onfire.model.Model */item) {
             return item.update(/** @type {!Object<string,Firebase.Value>} */(opt_values));
@@ -105,17 +147,22 @@ onfire.model.Collection.prototype.createItem = function(opt_values) {
 
 
 /**
- * Fetch an item by its ID, or create it if it does not yet exist, and use the provided ID.
+ * Fetch an item by its key, or create it if it does not yet exist, and use the provided key.
  *
- * @param {string} id
+ * @param {string} key
  * @param {Object} values A set of property/value pairs to assign if created. If null, don't set
  *      any values. The object will come into existence only when a value is set.
  * @return {!Promise<!T,!Error>|!goog.Promise<!T,!Error>}
  * @export
  */
-onfire.model.Collection.prototype.fetchOrCreateItem = function(id, values) {
+onfire.model.Collection.prototype.fetchOrCreate = function(key, values) {
 
-    return this.fetchItem(id).
+    if (!this.memberCtor_) {
+        throw new Error('.fetchOrCreate() is for fetching/creating models, not primitive values');
+    }
+
+    var item = new this.memberCtor_(this.ref.child(key));
+    return item.whenLoaded().
         then(function(/** !onfire.model.Model */item) {
 
             if (values) {
@@ -133,25 +180,37 @@ onfire.model.Collection.prototype.fetchOrCreateItem = function(id, values) {
 
 
 /**
- * Remove the specified member of the collection.
+ * Remove the specified member of the collection. The promise is not rejected if the member is not
+ * present.
  *
- * @param {string} id The ID of the member.
- * @return {!Promise|!goog.Promise}
+ * @param {string} key The key of the member.
+ * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>}
  * @export
  */
-onfire.model.Collection.prototype.removeItem = function(id) {
+onfire.model.Collection.prototype.remove = function(key) {
+
+    if (!this.containsKey(key)) {
+        return onfire.utils.promise.resolve(null);
+    }
+
+    // We need an instance of the item being removed, so that we can provide it to the trigger
+    // function. Nope -- by the time that happens, its properties will be null?!! Add a .disconnect()
+    // method that will freeze the current snapshot?
+    var promise = this.memberCtor_ ?
+        this.fetch(key) : onfire.utils.promise.resolve(this.getBasicValue(key));
 
     var removed;
     var self = this;
-    return this.fetchItem(id).
-        then(function(item) {
+    return promise.
+        then(function(/** !onfire.model.Model|Firebase.Value */item) {
             removed = item;
         }).
         then(function() {
-            return self.set(id, null);
+            self.set(key, null);
+            return self.save();
         }).
         then(function() {
-            return onfire.triggers.triggerChildRemoved(self.ref, removed);
+            return onfire.triggers.triggerChildRemoved(self.ref, removed, key);
         }).
         then(function() {
             removed.dispose();
@@ -162,18 +221,21 @@ onfire.model.Collection.prototype.removeItem = function(id) {
 /**
  * Perform an operation on each member of the collection.
  *
- * @param {!function(!onfire.model.Model, string=):(!Promise|!goog.Promise|undefined)} callback
+ * @param {
+        !function((!onfire.model.Model|Firebase.Value), string=):(!Promise|!goog.Promise|undefined)
+    } callback
  * @return {(!Promise|!goog.Promise)}
  * @export
  */
 onfire.model.Collection.prototype.forEach = function(callback) {
 
     var promises = [];
-    for (var id in this.storageObj) {
+    for (var key in this.storageObj) {
 
-        var p = this.fetchItem(id).
-            then(function(item) {
-                return callback.call(null, item, id);
+        var p = this.memberCtor_ ?
+            this.fetch(key) : onfire.utils.promise.resolve(this.getBasicValue(key));
+        p.then(function(/** !onfire.model.Model|Firebase.Value */item) {
+                return callback.call(null, item, key);
             });
         promises.push(p);
     }
@@ -195,12 +257,25 @@ onfire.model.Collection.prototype.count = function() {
 
 
 /**
- * Return an array of the IDs of items in the collection.
+ * Determines whether the collection already has an entry for the provided key.
+ *
+ * @param {string} key
+ * @return {boolean}
+ * @export
+ */
+onfire.model.Collection.prototype.containsKey = function(key) {
+
+    return key in this.storageObj;
+};
+
+
+/**
+ * Return an array of the keys of items in the collection.
  *
  * @return {!Array<string>}
  * @export
  */
-onfire.model.Collection.prototype.ids = function() {
+onfire.model.Collection.prototype.keys = function() {
 
     return goog.object.getKeys(this.storageObj);
 };

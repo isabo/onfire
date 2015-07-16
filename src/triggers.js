@@ -204,11 +204,12 @@ onfire.triggers.triggerChildAdded = function(ref, child) {
  *
  * @param {onfire.Ref} ref The reference where the event happened.
  * @param {!Model|Firebase.Value} child The child model instance or value that was removed.
+ * @param {string} key The key of the removed value.
  * @return {!Promise<!Array,!Error>|!goog.Promise<!Array,!Error>}
  */
-onfire.triggers.triggerChildRemoved = function(ref, child) {
+onfire.triggers.triggerChildRemoved = function(ref, child, key) {
 
-    return onfire.triggers.trigger_(ref, onfire.utils.firebase.EventType.CHILD_REMOVED, child);
+    return onfire.triggers.trigger_(ref, onfire.utils.firebase.EventType.CHILD_REMOVED, child, key);
 };
 
 

@@ -2,6 +2,7 @@ goog.provide('onfire.model.Collection');
 
 goog.require('onfire.model.Model');
 goog.require('onfire.triggers');
+goog.require('onfire.utils.firebase.EventType');
 goog.require('onfire.utils.promise');
 goog.require('goog.object');
 
@@ -30,6 +31,38 @@ onfire.model.Collection = function(ref, opt_memberCtor) {
     this.memberCtor_ = opt_memberCtor;
 };
 goog.inherits(onfire.model.Collection, onfire.model.Model);
+
+
+/**
+ * Load the initial data and watch for changes.
+ *
+ * @override
+ * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>}
+ * @protected
+ */
+onfire.model.Collection.prototype.startMonitoring = function() {
+
+    var self = this;
+    var p = this.ref.onceValue().
+        then(function(/** Object */data) {
+            self.handleValue(data);
+        });
+
+    // When the above promise resolves, the collecion is fully loaded. It will then need to listen
+    // for new and removed items.
+
+    p.then(function() {
+        var f1 = self.ref.on(onfire.utils.firebase.EventType.CHILD_ADDED, self.handleChildAdded_,
+            undefined, self);
+        var f2 = self.ref.on(onfire.utils.firebase.EventType.CHILD_REMOVED,
+            self.handleChildRemoved_, undefined, self);
+
+        self.monitoringParams.push([onfire.utils.firebase.EventType.CHILD_ADDED, f1, self]);
+        self.monitoringParams.push([onfire.utils.firebase.EventType.CHILD_REMOVED, f2, self]);
+    });
+
+    return p;
+};
 
 
 /**
@@ -65,12 +98,11 @@ onfire.model.Collection.prototype.get = function(key) {
  */
 onfire.model.Collection.prototype.getModel = function(key) {
 
-    // TODO: validate that we have such an item.
     if (this.memberCtor_) {
         if (this.containsKey(key)) {
             return new this.memberCtor_(this.ref.child(key));
         } else {
-            throw new Error('No such key in the collection.');
+            throw new Error('No such key in theis collection: ' + key);
         }
     } else {
         throw new Error('Cannot create a model for a primitive value');
@@ -78,14 +110,47 @@ onfire.model.Collection.prototype.getModel = function(key) {
 };
 
 
-// TODO: should we change the visibility of this to protected?
 /**
- * @override the return type.
- * @param {string} propertyName The name of a property.
+ * Get a primitive value or an object that is not wrapped by an onfire.model.Model instance.
+ *
+ * @param {string} key The key of the desired value.
+ * @return {Firebase.Value}
+ * @export
+ */
+onfire.model.Collection.prototype.getBasicValue = function(key) {
+
+    if (this.containsKey(key)) {
+        return this.storageObj[key];
+    } else {
+        throw new Error('No such key in this collection: ' + key);
+    }
+};
+
+
+/**
+ * Change the primitive value of a property. Returns a a reference to the current model to allow
+ * chaining.
+ *
+ * @override return type.
+ * @param {string} key The name of a property.
  * @param {Firebase.Value} value The primitive value to assign to the property.
  * @return {!onfire.model.Collection}
+ * @export
  */
-onfire.model.Collection.prototype.set;
+onfire.model.Collection.prototype.set = function(key, value) {
+
+    // TODO: validate that value is a Firebase.Value.
+    // TODO: validate that value matches the schema.
+
+    if (this.memberCtor_) {
+        throw new Error('.set() is for primitive values, not models');
+    }
+
+    this.changes[key] = value;
+    this.hasOustandingChanges = true;
+
+    return this;
+};
 
 
 // TODO: should we change the visibility of this to protected?
@@ -307,10 +372,8 @@ onfire.model.Collection.prototype.handleChildAdded_ = function(snapshot) {
 onfire.model.Collection.prototype.handleChildRemoved_ = function(snapshot) {
 
     delete this.storageObj[snapshot.key()];
-
-    if (goog.object.getKeys(this.storageObj).length === 0) {
+    this.childrenCount--;
+    if (this.childrenCount === 0) {
         this.storageObj = null;
     }
-
-    this.childrenCount--;
 };

@@ -2,6 +2,7 @@ goog.provide('onfire.model.Model');
 
 goog.require('onfire.Ref');
 goog.require('onfire.model.schema');
+goog.require('onfire.utils.firebase.EventType');
 goog.require('onfire.utils.promise');
 goog.require('onfire.utils.logging');
 goog.require('onfire.triggers');
@@ -47,9 +48,9 @@ onfire.model.Model = function(ref) {
      * Whether there are changes that have not yet been saved.
      *
      * @type {boolean}
-     * @private
+     * @protected
      */
-    this.hasChanges_ = false;
+    this.hasOustandingChanges = false;
 
     /**
      * The number of properties in this model. Useful for collections where the property name is
@@ -77,12 +78,20 @@ onfire.model.Model = function(ref) {
     this.toDispose_ = [];
 
     /**
+     * Monitoring details that need to be unmonitored during disposal.
+     *
+     * @type {!Array<!Array>} An array where each entry is an array [event name, function, context].
+     * @protected
+     */
+    this.monitoringParams = [];
+
+    /**
      * A promise that resolves when the model data has finished loading.
      *
      * @type {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>}
      * @private
      */
-    this.loadPromise_ = this.startMonitoring_();
+    this.loadPromise_ = this.startMonitoring();
 };
 
 
@@ -121,9 +130,9 @@ onfire.model.Model.prototype.configureInstance = function(schema) {
 
     var promises = [];
 
-    for (var name in this.schema) {
+    for (var key in this.schema) {
 
-        var rhs = this.schema[name];
+        var rhs = this.schema[key];
         var ctor;
         var valueType = onfire.model.schema.determineValueType(rhs);
 
@@ -143,16 +152,16 @@ onfire.model.Model.prototype.configureInstance = function(schema) {
                 // The value is the schema for a subordinate model.
                 // Create the appropriate model or collection instance from the constructor that
                 // was generated during the definition phase.
-                ctor = this[name + onfire.model.Model.CONSTRUCTOR_SUFFIX];
-                this[name + onfire.model.Model.INSTANCE_SUFFIX] = new ctor(this.ref.child(name));
-                promises.push(this[name + onfire.model.Model.INSTANCE_SUFFIX].whenLoaded());
+                ctor = this[key + onfire.model.Model.CONSTRUCTOR_SUFFIX];
+                this[key + onfire.model.Model.INSTANCE_SUFFIX] = new ctor(this.ref.child(key));
+                promises.push(this[key + onfire.model.Model.INSTANCE_SUFFIX].whenLoaded());
 
                 // Remember to dispose of it when no longer needed.
-                this.toDispose_.push(this[name + onfire.model.Model.INSTANCE_SUFFIX]);
+                this.toDispose_.push(this[key + onfire.model.Model.INSTANCE_SUFFIX]);
                 break;
 
             default:
-                throw new TypeError('Invalid property type for ' + name);
+                throw new TypeError('Invalid property type for ' + key);
         }
     }
 
@@ -173,9 +182,9 @@ onfire.model.Model.prototype.configureInstance = function(schema) {
  * Load the initial data and watch for changes.
  *
  * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>}
- * @private
+ * @protected
  */
-onfire.model.Model.prototype.startMonitoring_ = function() {
+onfire.model.Model.prototype.startMonitoring = function() {
 
     var self = this;
     return onfire.utils.promise.newPromise(function(resolve, reject) {
@@ -183,31 +192,34 @@ onfire.model.Model.prototype.startMonitoring_ = function() {
         var isLoaded = false;
 
         // Monitor VALUE events.
-        self.ref.onValue(function(/** !Object */newValue) {
+        var fn = self.ref.onValue(function(/** !Object */newValue) {
 
-            self.handleValue_(newValue);
+            self.handleValue(newValue);
 
             // Resolve/reject promise upon first response.
             if (!isLoaded) {
-                resolve(self);
                 isLoaded = true;
+                resolve(self);
             }
         }, undefined);
+
+        // Store the monitoring function to be used during disposal.
+        self.monitoringParams.push([onfire.utils.firebase.EventType.VALUE, fn]);
     });
 };
 
 
 /**
- * Stop monitoring add/remove of children.
+ * Stop monitoring Firebase events.
  *
  * @private
  */
 onfire.model.Model.prototype.stopMonitoring_ = function() {
 
-    // Remove anything that the current instance is watching.
-    // TODO: make this specific to the on() handlers, otherwise we cancel other watchers for the
-    // same location, but elsewhere in the app.
-    this.ref.off(undefined, undefined, this);
+    // Remove listeners.
+    for (var i = 0; i < this.monitoringParams.length; i++) {
+        this.ref.off.apply(this.ref, this.monitoringParams[i]);
+    }
 };
 
 
@@ -252,9 +264,9 @@ onfire.model.Model.prototype.exists = function() {
  * Handle an updated object.
  *
  * @param {Object} newValue
- * @private
+ * @protected
  */
-onfire.model.Model.prototype.handleValue_ = function(newValue) {
+onfire.model.Model.prototype.handleValue = function(newValue) {
 
     this.storageObj = newValue;
     this.childrenCount = goog.object.getKeys(newValue).length;
@@ -262,44 +274,65 @@ onfire.model.Model.prototype.handleValue_ = function(newValue) {
 
 
 /**
- * Get the value of a property.
+ * Get the value stored under a key.
  *
- * @param {string} propertyName The name of a property.
+ * @param {string} key
  * @return {Firebase.Value|onfire.model.Model}
  * @export
  */
-onfire.model.Model.prototype.get = function(propertyName) {
+onfire.model.Model.prototype.get = function(key) {
 
-    // TODO: validate that we have such a property.
-    return this.getModel(propertyName) ||  this.getBasicValue(propertyName);
+    if (this.isKeySpecified_(key) && typeof this.schema[key] !== 'string') {
+        // The key represents a model, not a primitive.
+        return this.getModel(key);
+    } else {
+        return this.getBasicValue(key);
+    }
 };
 
 
 /**
  * Get a primitive value or an object that is not wrapped by an onfire.model.Model instance.
+ * If the key exists, return its value, regardless of whether the schema specifies it. Otherwise,
+ * return null, or throw an exception if the key is not specified in the schema.
  *
- * @param {string} propertyName The name of a property.
+ * @param {string} key The key under which the value is stored.
  * @return {Firebase.Value}
  * @export
  */
-onfire.model.Model.prototype.getBasicValue = function(propertyName) {
+onfire.model.Model.prototype.getBasicValue = function(key) {
 
-    // TODO: validate that we have such a property.
-    return !!this.storageObj ? this.storageObj[propertyName] : null;
+    if (this.storageObj) {
+        if (key in this.storageObj) {
+            return this.storageObj[key];
+        } else {
+            if (this.isKeySpecified_(key)) {
+                return null;
+            } else {
+                throw new Error('No such property: ' + key);
+            }
+        }
+    } else {
+        throw new Error('Not loaded yet');
+    }
 };
 
 
 /**
- * Get the model instance that represents a property value.
+ * Get the model instance that represents the value stored under a key.
  *
- * @param {string} propertyName The name of a property.
+ * @param {string} key
  * @return {!onfire.model.Model}
  * @export
  */
-onfire.model.Model.prototype.getModel = function(propertyName) {
+onfire.model.Model.prototype.getModel = function(key) {
 
-    // TODO: validate that we have such a property.
-    return this[propertyName + onfire.model.Model.INSTANCE_SUFFIX];
+    if (this.isKeySpecified_(key) && typeof this.schema[key] !== 'string') {
+        // Specified as a primitive value.
+        return this[key + onfire.model.Model.INSTANCE_SUFFIX];
+    } else {
+        throw new Error('No such property: ' + key);
+    }
 };
 
 
@@ -307,42 +340,36 @@ onfire.model.Model.prototype.getModel = function(propertyName) {
  * Change the primitive value of a property. Returns a a reference to the current model to allow
  * chaining.
  *
- * @param {string} propertyName The name of a property.
+ * @param {string} key The name of a property.
  * @param {Firebase.Value} value The primitive value to assign to the property.
  * @return {!onfire.model.Model}
  * @export
  */
-onfire.model.Model.prototype.set = function(propertyName, value) {
+onfire.model.Model.prototype.set = function(key, value) {
 
     // TODO: validate that value is a Firebase.Value.
     // TODO: validate that value matches the schema.
-    this.changes[propertyName] = value;
-    this.hasChanges_ = true;
+    if (!this.isKeySpecified_(key)) {
+        throw new Error('No such property: ' + key);
+    }
+
+    this.changes[key] = value;
+    this.hasOustandingChanges = true;
 
     return this;
 };
 
 
 /**
- * Commit the outstanding changes.
+ * Determines whether a key is specified in the schema.
  *
- * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>}
- * @export
+ * @param {string} key
+ * @return {boolean}
+ * @private
  */
-onfire.model.Model.prototype.save = function() {
+onfire.model.Model.prototype.isKeySpecified_ = function(key) {
 
-    if (this.hasChanges_) {
-        return this.update(this.changes).
-            then(function(/** !onfire.model.Model */self) {
-                // Reset the changes.
-                self.changes = {};
-                self.hasChanges_ = false;
-
-                return self;
-            });
-    } else {
-        return onfire.utils.promise.resolve(this);
-    }
+    return key in this.schema;
 };
 
 
@@ -354,7 +381,29 @@ onfire.model.Model.prototype.save = function() {
  */
 onfire.model.Model.prototype.hasChanges = function() {
 
-    return this.hasChanges_;
+    return this.hasOustandingChanges;
+};
+
+
+/**
+ * Commit the outstanding changes.
+ *
+ * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>}
+ * @export
+ */
+onfire.model.Model.prototype.save = function() {
+
+    if (this.hasOustandingChanges) {
+        return this.update(this.changes).
+            then(function(/** !onfire.model.Model */self) {
+                // Reset the changes.
+                self.changes = {};
+                self.hasOustandingChanges = false;
+                return self;
+            });
+    } else {
+        return onfire.utils.promise.resolve(this);
+    }
 };
 
 

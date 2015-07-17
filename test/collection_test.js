@@ -38,6 +38,7 @@ test('Collection of primitives', function(t) {
         t.deepEqual(thingIds.keys(), [], '.keys() is correct');
 
 
+
         thingIds.whenLoaded().
             then(function() {
 
@@ -51,11 +52,25 @@ test('Collection of primitives', function(t) {
                 // Test basic properties once it is loaded.
                 t.equal(thingIds.count(), count, '.count() is correct');
                 t.deepEqual(thingIds.keys(), keys, '.keys() is correct');
+                t.ok(thingIds.containsKey(keys[0]), '.containsKey() returns true for an existing key');
+                t.notOk(thingIds.containsKey('nosuchkey'), '.containsKey() returns false for non-existent key');
 
                 // Get the primitive values.
                 for (key in testData) {
                     t.equal(thingIds.get(key), testData[key], 'Retrieves correct value for ' + key);
                 }
+
+                // These should trigger errors.
+                t.throws(function(){thingIds.getModel(keys[0])}, Error,
+                    'Throws an exception when trying to retrieve a model instead of a primitive');
+                t.throws(function(){thingIds.fetch(keys[0])}, Error,
+                    'Throws an exception when trying to fetch a model instead of a primitive');
+                t.throws(function(){thingIds.create()}, Error,
+                    'Throws an exception when trying to create a model instead of a primitive');
+                t.throws(function(){thingIds.fetchOrCreatecreate('newkey')}, Error,
+                    'Throws an exception when trying to fetchOrCreate a model instead of a primitive');
+                t.throws(function(){thingIds.get('nosuchkey')}, Error,
+                    'Throws an exception when trying to retrieve a nonexistent item');
 
 
                 t.end();
@@ -64,3 +79,9 @@ test('Collection of primitives', function(t) {
     });
     ref.flush();
 });
+
+
+// Add, remove
+// Model values
+// forEach
+// Does it pick up added/removed items?

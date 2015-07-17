@@ -49,7 +49,14 @@ test('Simple model', function (t) {
                 for (var p in testData) {
                     t.equal(thing[p](), testData[p], '.' + p + '() === ' + testData[p]);
                     t.equal(thing.get(p), testData[p], '.get(' + p + ') === ' + testData[p]);
+                    t.throws(function(){thing.getModel(p)}, Error, '.getModel(' + p +
+                        ') throws an exception for a primitive value');
                 }
+                t.throws(function(){thing.get('nosuchkey')}, Error,
+                    '.get() throws an exception for a non-existent key');
+                t.throws(function(){thing.getModel('nosuchkey')}, Error,
+                    '.get() throws an exception for a non-existent key');
+
 
                 // Test the setters.
                 for (p in schema) {
@@ -70,7 +77,7 @@ test('Simple model', function (t) {
 
                 t.ok(thing.hasChanges(), 'Model has outstanding changes');
 
-                thing.save().then(function() {
+                var pr = thing.save().then(function() {
                     // Compare the model's values with the expected values.
                     for (var p in schema) {
                         switch (schema[p]) {
@@ -84,27 +91,32 @@ test('Simple model', function (t) {
                                 expected = !testData[p];
                         }
                         t.equal(thing[p](), expected, '.' + p + '(value) updates model correctly');
-                        t.equal(ref.child(p).getData(), expected, '.' + p + '(value) updates database correctly');
+                        t.equal(ref.child(p).getData(), expected, '.' + p +
+                            '(value) updates database correctly');
                     }
 
                 }, function(err) {
                     t.error(err, 'Failed to save the changes');
                 });
 
+                ref.flush();
 
+                return pr;
 
             }, function(err) {
                 t.error(err);
             }).
             then(function() {
+                thing.dispose();
                 t.end();
             });
     });
     ref.flush();
 });
 
+// getModel
+// Does it pick up changes from the database?
 // Pass a non-ref to model constructor --> exception.
-// .get('non-existent property') --> throws exception.
 // .getBasicValue('non-existent property') --> throws exception.
 // .getModel('non-existent property or not a model') --> throws exception.
 // Missing boolean = false; Missing number = 0? --> only with a definition of default in schema? string=''?

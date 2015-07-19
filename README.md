@@ -96,18 +96,18 @@ person.jobs().fetchOrCreate('zyx-321-cba',
 
 |Arguments|
 |---------|
-|`urlOrFirebase`| A Firebase URL or a Firebase reference.
+|`urlOrFirebase`| A Firebase URL or a Firebase reference.|
 
-Return Value
-------------
-`onfire.Ref`
+|Return Value|
+|------------|
+|`onfire.Ref`|
 
 #### onfire.Ref.child(childPath)
 Returns a reference relative to the parent reference.
 
 |Arguments|
 |---------|
-|`childPath`|  A relative path from the current location to the child location.
+|`childPath`|  A relative path from the current location to the child location.|
 
 |Return Value|
 |------------|

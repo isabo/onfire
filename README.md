@@ -94,31 +94,31 @@ person.jobs().fetchOrCreate('zyx-321-cba',
 ### onfire.Ref
 `new onfire.Ref(urlOrFirebase)` creates an analogue of a Firebase instance.
 
-|Arguments|
-|---------|
-|`urlOrFirebase`| A Firebase URL or a Firebase reference.|
+Arguments | Description
+----------|------------
+`urlOrFirebase`| A Firebase URL or a Firebase reference.
 
-|Return Value|
-|------------|
-|`onfire.Ref`|
+Return Value | Description
+-------------|------------
+`onfire.Ref` |
 
 #### onfire.Ref.child(childPath)
 Returns a reference relative to the parent reference.
 
-|Arguments|
-|---------|
-|`childPath`|  A relative path from the current location to the child location.|
+Arguments | Description
+----------|------------
+`childPath`| A relative path from the current location to the child location.
 
-|Return Value|
-|------------|
-|`onfire.Ref`|
+Return Value | Description
+-------------|------------
+`onfire.Ref` |
 
 #### onfire.Ref.root()
 Returns a reference to the root of the tree.
 
-|Return Value|
-|------------|
-|`onfire.Ref`|
+Return Value | Description
+-------------|------------
+`onfire.Ref` |
 
 
 

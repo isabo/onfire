@@ -96,7 +96,7 @@ person.jobs().fetchOrCreate('zyx-321-cba',
 
 Method              | Description
 --------------------|-------------------------------------------------------------------------------
-`new onfire.Ref()`  | Creates a new reference to a point in a Firebase database.
+`new onfire.Ref()`  | Creates a new reference to a point in a Firebase database. This is a very loooong line indeed, will it be broken?
                     | Arguments:
                     | `urlOrFirebase`: A Firebase URL or instance.
                     | Returns: `onfire.Ref`

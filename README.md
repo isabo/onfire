@@ -92,22 +92,35 @@ person.jobs().fetchOrCreate('zyx-321-cba',
 
 ## Documentation
 ### onfire.Ref
-`onfire.Ref` is an analogue of a Firebase instance.
+`new onfire.Ref(urlOrFirebase)` creates an analogue of a Firebase instance.
 
-Method              | Description
---------------------|-------------------------------------------------------------------------------
-`new onfire.Ref()`  | Creates a new reference to a point in a Firebase database. This is a very loooong line indeed, will it be broken?
-                    | Arguments:
-                    | `urlOrFirebase`: A Firebase URL or instance.
-                    | Returns: `onfire.Ref`
---------------------|-------------------------------------------------------------------------------
-`child()`           | Returns a reference relative to the parent reference.
-                    | Arguments:
-                    | `childPath`: A relative path from the current location to the child location.
-                    | Returns: `onfire.Ref`
---------------------|-------------------------------------------------------------------------------
-`root()`            | Returns a reference to the root of the tree.
-                    | Returns: `onfire.Ref`
+Arguments
+---------
+`urlOrFirebase`| A Firebase URL or a Firebase reference.
+
+Return Value
+------------
+`onfire.Ref`
+
+#### onfire.Ref.child(childPath)
+Returns a reference relative to the parent reference.
+
+Arguments
+---------
+`childPath`|  A relative path from the current location to the child location.
+
+Return Value
+------------
+`onfire.Ref`
+
+#### onfire.Ref.root()
+Returns a reference to the root of the tree.
+
+Return Value
+------------
+`onfire.Ref`
+
+
 
 
 ## How to use OnFire in your project

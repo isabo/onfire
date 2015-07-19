@@ -9,9 +9,14 @@ Already implemented:
 Coming soon:
 * Loose coupling between locally triggered "chain-reaction" operations, allowing more
   compartmentalization and less spaghetti code.
-* Persistence!
+* Persistence! This is for loading data while offline, or for priming your app for a quick start.
 
 Here are [more details](https://github.com/isabo/onfire/wiki/OnFire-Goals-&-Requirements).
+
+## Contents
+* [Examples](#examples)
+* [How to use OnFire in your project](#how-to-use-onfire-in-your-project)
+* [How to set up the development environment](#how-to-set-up-the-development-environment)
 
 ## Examples
 Schema-driven modules prevent unintentional errors later on.

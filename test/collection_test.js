@@ -37,7 +37,6 @@ test('Collection of primitives', function(t) {
         t.equal(thingIds.count(), 0, '.count() is correct');
         t.deepEqual(thingIds.keys(), [], '.keys() is correct');
 
-
         thingIds.whenLoaded().
             then(function() {
 
@@ -52,12 +51,8 @@ test('Collection of primitives', function(t) {
                 t.equal(thingIds.count(), count, '.count() is correct');
                 t.deepEqual(thingIds.keys(), keys, '.keys() is correct');
                 t.ok(thingIds.containsKey(keys[0]), '.containsKey() returns true for an existing key');
-                t.notOk(thingIds.containsKey('nosuchkey'), '.containsKey() returns false for non-existent key');
-
-                // Get the primitive values.
-                for (key in testData) {
-                    t.equal(thingIds.get(key), testData[key], 'Retrieves correct value for ' + key);
-                }
+                t.notOk(thingIds.containsKey('nosuchkey'),
+                    '.containsKey() returns false for non-existent key');
 
                 // These should trigger errors.
                 t.throws(function(){thingIds.getModel(keys[0])}, Error,
@@ -66,19 +61,173 @@ test('Collection of primitives', function(t) {
                     'Throws an exception when trying to fetch a model instead of a primitive');
                 t.throws(function(){thingIds.create()}, Error,
                     'Throws an exception when trying to create a model instead of a primitive');
-                t.throws(function(){thingIds.fetchOrCreatecreate('newkey')}, Error,
+                t.throws(function(){thingIds.fetchOrCreate('newkey')}, Error,
                     'Throws an exception when trying to fetchOrCreate a model instead of a primitive');
                 t.throws(function(){thingIds.get('nosuchkey')}, Error,
                     'Throws an exception when trying to retrieve a nonexistent item');
 
+                // Get the primitive values.
+                for (key in testData) {
+                    t.equal(thingIds.get(key), testData[key], 'Retrieves correct value for ' + key);
+                }
 
+            }, function(err) {
+                t.error(err, 'Failed to load the model instance');
+            }).
+            then(function() {
+                t.doesNotThrow(function(){thingIds.set('c', true)}, Error,
+                    '.set() works on a primitive collecion');
+                t.notOk(thingIds.containsKey('c'),
+                    '.containsKey() returns false for a not-yet-saved key');
+                t.equal(thingIds.hasChanges(), true, '.hasChanges() is true after .set()');
+
+                var p = thingIds.save().
+                    then(function() {
+                        t.ok(thingIds.containsKey('c'),
+                            '.containsKey() returns true for a newly-saved key');
+                        t.equal(thingIds.get('c'), true,
+                            'Newly saved primitive value is correct');
+                    }, function(err) {
+                        t.error(err, '.save() failed');
+                    });
+                ref.flush();
+                return p;
+            }).
+            then(function() {
+
+                t.doesNotThrow(function(){thingIds.remove('nosuchkey')}, Error,
+                    'Does not throw exception when attempting to remove non-existent key');
+
+                var p = thingIds.remove('c').
+                    then(function() {
+                        t.comment('Hello');
+                        t.notOk(thingIds.containsKey('c'),
+                            '.containsKey() returns false for a removed key');
+                        t.throws(function(){thingIds.get('c')}, Error,
+                            '.set() throws an error on a removed key');
+                    }, function(err) {
+                        t.error(err, '.remove() failed');
+                    });
+                setTimeout(function() {
+                    ref.flush()
+                });
+                return p;
+
+            }, function(err) {
+                t.error(err, 'Something went wrong with the .set() tests');
+            }).
+            then(function() {
                 t.end();
+            }, function(err) {
+                t.error(err, 'Something went wrong with the .remove() tests');
             });
 
     });
     ref.flush();
 });
 
+test('Collection of objects', function(t) {
+
+    // Prepare the constructor.
+    var schema = {
+        '$id': {
+            name: 'string'
+        }
+    };
+    var Things = onfire.defineModel(schema);
+
+    // Prepare the database.
+    var ref = rootRef.child('things');
+    var testData = {
+        'one': {
+            'name': 'One'
+        },
+        'two': {
+            'name': 'Two'
+        },
+    }
+    ref.set(testData, function(err) {
+        t.error(err, 'Test data prepared successfully');
+
+        var thingsRef = new onfire.Ref(ref);
+
+        try {
+            var things = new Things(thingsRef);
+        } catch (e) {
+            t.fail('Failed to create an instance: ' + e);
+        }
+
+
+        // Test basic properties.
+        t.equal(things.key(), ref.key(), '.key() property works');
+        t.equal(things.exists(), false, '.exists() is false before loading');
+        t.equal(things.hasChanges(), false, '.hasChanges() is false before loading');
+        t.equal(things.count(), 0, '.count() is correct');
+        t.deepEqual(things.keys(), [], '.keys() is correct');
+
+        things.whenLoaded().
+            then(function() {
+                // Collect expected data values.
+                var keys = [];
+                for (var key in testData) {
+                    keys.push(key);
+                }
+                var count = keys.length;
+
+                // Test basic properties once it is loaded.
+                t.equal(things.count(), count, '.count() is correct');
+                t.deepEqual(things.keys(), keys, '.keys() is correct');
+                t.ok(things.containsKey(keys[0]), '.containsKey() returns true for an existing key');
+                t.notOk(things.containsKey('nosuchkey'),
+                    '.containsKey() returns false for non-existent key');
+
+                // These should trigger errors.
+                t.throws(function(){thingIds.get('nosuchkey')}, Error,
+                    'Throws an exception when trying to get a nonexistent item');
+                t.throws(function(){thingIds.fetch('nosuchkey')}, Error,
+                    'Throws an exception when trying to fetch a nonexistent item');
+
+                // Get the items.
+                var promises = [];
+                for (key in testData) {
+                    var thing = things.get(key);
+                    t.ok(thing instanceof onfire.model.Model,
+                        '.get(' + key + ') returns a model instance');
+                    t.ok(things.getModel(key) instanceof onfire.model.Model,
+                        '.getModel(' + key + ') returns a model instance');
+                    t.deepEqual(things.getBasicValue(key), testData[key],
+                        '.getBasicValue(' + key + ') returns the correct value');
+
+                    // Wrapped in a function to preserve the loop values at each iteration for the
+                    // corresponding callback.
+                    (function checkGetters(thing, key) {
+                        var p = things.fetch(key).
+                            then(function(thing) {
+                                for (mk in testData[key]) {
+                                    t.equal(thing[mk](), testData[key][mk],
+                                        'thing.' + mk + '() === ' + testData[key][mk]);
+                                }
+                            });
+                        promises.push(p);
+                        ref.flush();
+                    })(thing, key);
+                }
+
+                return Promise.all(promises);
+
+            }, function(err) {
+                t.error(err, 'Failed to load the collection instance');
+            }).
+            then(function() {
+                // TODO: test add/remove.
+            }).
+            then(function() {
+                t.end();
+            });
+    });
+
+    ref.flush();
+});
 
 test('Read Permission Denied', function(t) {
 
@@ -106,6 +255,5 @@ test('Read Permission Denied', function(t) {
 });
 
 // Add, remove
-// Model values
 // forEach
 // Does it pick up added/removed items?

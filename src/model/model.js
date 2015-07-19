@@ -429,7 +429,9 @@ onfire.model.Model.prototype.update = function(pairs) {
     var oldCount = this.childrenCount;
     var oldPairs = {};
     for (var p in pairs) {
-        oldPairs[p] = this.get(p);
+        try {
+            oldPairs[p] = this.getBasicValue(p);
+        } catch (e) {}
     }
 
     var self = this;

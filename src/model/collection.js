@@ -46,6 +46,7 @@ onfire.model.Collection.prototype.startMonitoring = function() {
     var p = this.ref.onceValue().
         then(function(/** Object */data) {
             self.handleValue(data);
+            return self;
         });
 
     // When the above promise resolves, the collecion is fully loaded. It will then need to listen
@@ -143,7 +144,8 @@ onfire.model.Collection.prototype.set = function(key, value) {
     // TODO: validate that value matches the schema.
 
     if (this.memberCtor_) {
-        throw new Error('.set() is for primitive values, not models');
+        throw new Error('.set() is for primitive values, not models.' +
+            ' Use .create() or .fetchOrCreate() instead.');
     }
 
     this.changes[key] = value;
@@ -153,7 +155,6 @@ onfire.model.Collection.prototype.set = function(key, value) {
 };
 
 
-// TODO: should we change the visibility of this to protected?
 /**
  * @override the return type.
  * @return {!onfire.model.Collection}
@@ -195,7 +196,8 @@ onfire.model.Collection.prototype.fetch = function(key) {
 onfire.model.Collection.prototype.create = function(opt_values) {
 
     if (!this.memberCtor_) {
-        throw new Error('.create() is for creating models, not primitive values');
+        throw new Error('.create() is for creating models, not primitive values.' +
+            ' Use .set() instead.');
     }
 
     var key = this.ref.generateId();
@@ -278,7 +280,9 @@ onfire.model.Collection.prototype.remove = function(key) {
             return onfire.triggers.triggerChildRemoved(self.ref, removed, key);
         }).
         then(function() {
-            removed.dispose();
+            if (removed instanceof onfire.model.Model) {
+                removed.dispose();
+            }
         });
 };
 

@@ -25,12 +25,12 @@ onfire.Ref = function(ref) {
 
 
 /**
- * @param {string} childName
+ * @param {string} childPath
  * @param {string=} opt_id
  * @return {!onfire.Ref}
  * @export
  */
-onfire.Ref.prototype.child = function(childName, opt_id) {
+onfire.Ref.prototype.child = function(childPath, opt_id) {
 
     var ref = this.ref_.child(childName);
 

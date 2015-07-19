@@ -356,7 +356,7 @@ onfire.model.Model.prototype.set = function(key, value) {
 
     // TODO: validate that value is a Firebase.Value.
     // TODO: validate that value matches the schema.
-    if (!this.isKeySpecified_(key)) {
+    if (!(key in this.storageObj) && !this.isKeySpecified_(key)) {
         throw new Error('No such property: ' + key);
     }
 

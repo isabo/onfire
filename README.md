@@ -96,9 +96,9 @@ person.jobs().fetchOrCreate('zyx-321-cba',
 
 Method              | Description
 --------------------|-------------------------------------------------------------------------------
-new onfire.Ref()    | Creates a new reference to a point in a Firebase database.<br>
-                    | Arguments:<br>
-                    | `urlOrFirebase`: A Firebase URL or instance.
+new onfire.Ref()    | Creates a new reference to a point in a Firebase database.
+Arguments:
+`urlOrFirebase`: A Firebase URL or instance.
 --------------------|-------------------------------------------------------------------------------
 
 

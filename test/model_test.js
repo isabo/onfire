@@ -114,6 +114,32 @@ test('Simple model', function (t) {
     ref.flush();
 });
 
+test('Read Permission Denied', function(t) {
+
+    // Prepare the constructor.
+    var schema = {
+        number: 'number'
+    };
+    var Thing = onfire.defineModel(schema);
+
+
+    var ref = rootRef.child('test');
+    var thingRef = new onfire.Ref(ref);
+    // Make sure our listening will fail.
+    ref.failNext('on', new Error());
+    var thing = new Thing(thingRef);
+    thing.whenLoaded().
+        then(function() {
+            t.fail('Load succeeded when it should have failed');
+        }, function(err) {
+            t.pass('Load fails when permission denied');
+        }).
+        then(function() {
+            t.end();
+        });
+    ref.flush();
+});
+
 // getModel
 // Does it pick up changes from the database?
 // Pass a non-ref to model constructor --> exception.

@@ -38,7 +38,6 @@ test('Collection of primitives', function(t) {
         t.deepEqual(thingIds.keys(), [], '.keys() is correct');
 
 
-
         thingIds.whenLoaded().
             then(function() {
 
@@ -80,6 +79,31 @@ test('Collection of primitives', function(t) {
     ref.flush();
 });
 
+
+test('Read Permission Denied', function(t) {
+
+    var schema = {
+        '$id': 'boolean'
+    };
+    var ThingIds = onfire.defineModel(schema);
+
+    var ref = rootRef.child('primitiveCollection');
+    var thingIdsRef = new onfire.Ref(ref);
+    // Make sure our listening will fail.
+    ref.failNext('once', new Error());
+    var thingIds = new ThingIds(thingIdsRef);
+
+    thingIds.whenLoaded().
+        then(function() {
+            t.fail('Load succeeded when it should have failed');
+        }, function(err) {
+            t.pass('Load fails when permission denied');
+        }).
+        then(function() {
+            t.end();
+        });
+    ref.flush();
+});
 
 // Add, remove
 // Model values

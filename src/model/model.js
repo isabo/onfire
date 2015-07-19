@@ -201,7 +201,14 @@ onfire.model.Model.prototype.startMonitoring = function() {
                 isLoaded = true;
                 resolve(self);
             }
-        }, undefined);
+
+        }, function(/** !Error */err) {
+
+            // Monitoring is cancelled.
+            if (!isLoaded) {
+                reject(err);
+            }
+        });
 
         // Store the monitoring function to be used during disposal.
         self.monitoringParams.push([onfire.utils.firebase.EventType.VALUE, fn]);

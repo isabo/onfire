@@ -15,6 +15,7 @@ Here are [more details](https://github.com/isabo/onfire/wiki/OnFire-Goals-&-Requ
 
 ## Contents
 * [Examples](#examples)
+* [Documentation](#documentation)
 * [How to use OnFire in your project](#how-to-use-onfire-in-your-project)
 * [How to set up the development environment](#how-to-set-up-the-development-environment)
 
@@ -88,6 +89,18 @@ person.jobs().fetchOrCreate('zyx-321-cba',
         // job now exists in the database.
     });
 ```
+
+## Documentation
+### onfire.Ref
+`onfire.Ref` is an analogue of a Firebase instance.
+
+Method              | Description
+--------------------|-------------------------------------------------------------------------------
+new onfire.Ref()    | Creates a new reference to a point in a Firebase database.
+                    | Arguments:
+                    | `urlOrFirebase`: A Firebase URL or instance.
+--------------------|-------------------------------------------------------------------------------
+
 
 ## How to use OnFire in your project
 ### Browser based projects

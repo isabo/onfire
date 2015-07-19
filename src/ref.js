@@ -7,7 +7,7 @@ goog.require('goog.Uri');
 
 
 /**
- * Wrapper for Firebase references. Includes promisification of common methods.
+ * `onfire.Ref` is an analogue of a Firebase instance.
  *
  * @param {!Firebase} ref
  * @constructor

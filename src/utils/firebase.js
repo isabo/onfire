@@ -47,7 +47,7 @@ onfire.utils.firebase.newFirebase = function(path) {
 onfire.utils.firebase.push = function(ref, opt_value) {
     return onfire.utils.promise.newPromise(function(resolve, reject) {
         if (goog.isDef(opt_value)) {
-            var childRef = ref.push(opt_value, function(err) {
+            var childRef = ref.push(opt_value, function(/** Error */err) {
                 !err ? resolve(childRef) : reject(err);
             });
         } else {
@@ -67,7 +67,7 @@ onfire.utils.firebase.push = function(ref, opt_value) {
  */
 onfire.utils.firebase.set = function(ref, value) {
     return onfire.utils.promise.newPromise(function(resolve, reject) {
-        ref.set(value, function(err) {
+        ref.set(value, function(/** Error */err) {
             !err ? resolve() : reject(err);
         });
     });
@@ -83,7 +83,7 @@ onfire.utils.firebase.set = function(ref, value) {
  */
 onfire.utils.firebase.update = function(ref, values) {
     return onfire.utils.promise.newPromise(function(resolve, reject) {
-        ref.update(values, function(err) {
+        ref.update(values, function(/** Error */err) {
             !err ? resolve() : reject(err);
         });
     });
@@ -104,9 +104,10 @@ onfire.utils.firebase.update = function(ref, values) {
  */
 onfire.utils.firebase.transaction = function(ref, updateFn) {
     return onfire.utils.promise.newPromise(function(resolve, reject) {
-        ref.transaction(updateFn, function(err, isCommitted, snapshot) {
-            !err ? resolve({'isCommitted': isCommitted, 'snapshot': snapshot}) : reject(err);
-        }, false);
+        ref.transaction(updateFn,
+            function(/**Error*/err, /**boolean*/isCommitted, /**!Firebase.DataSnapshot*/snapshot) {
+                !err ? resolve({'isCommitted': isCommitted, 'snapshot': snapshot}) : reject(err);
+            }, false);
     });
 };
 
@@ -119,7 +120,7 @@ onfire.utils.firebase.transaction = function(ref, updateFn) {
  */
 onfire.utils.firebase.remove = function(ref) {
     return onfire.utils.promise.newPromise(function(resolve, reject) {
-        ref.remove(function(err) {
+        ref.remove(function(/** Error */err) {
             !err ? resolve() : reject(err);
         });
     });
@@ -135,7 +136,7 @@ onfire.utils.firebase.remove = function(ref) {
  */
 onfire.utils.firebase.once = function(ref, eventType) {
     return onfire.utils.promise.newPromise(function(resolve, reject) {
-        ref.once(eventType, function(snapshot) {
+        ref.once(eventType, function(/** !Firebase.DataSnapshot */snapshot) {
             resolve(snapshot);
         }, function(err) {
             reject(err);

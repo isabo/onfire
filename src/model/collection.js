@@ -295,7 +295,9 @@ onfire.model.Collection.prototype.remove = function(key) {
             removed = item;
         }).
         then(function() {
-            self.set(key, null);
+            // self.set(key, null); <-- will throw an exception if collection members are models.
+            self.changes[key] = null;
+            self.hasOustandingChanges = true;
             return self.save();
         }).
         then(function() {
@@ -406,9 +408,12 @@ onfire.model.Collection.prototype.handleChildAdded_ = function(snapshot) {
  */
 onfire.model.Collection.prototype.handleChildRemoved_ = function(snapshot) {
 
-    delete this.storageObj[snapshot.key()];
-    this.childrenCount--;
-    if (this.childrenCount === 0) {
-        this.storageObj = null;
+    var key = snapshot.key();
+    if (this.containsKey(key)) {
+        delete this.storageObj[key];
+        this.childrenCount--;
+        if (this.childrenCount === 0) {
+            this.storageObj = null;
+        }
     }
 };

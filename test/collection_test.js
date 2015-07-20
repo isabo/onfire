@@ -252,9 +252,71 @@ test('Collection of objects', function(t) {
             }).
             then(function() {
                 // Test .fetchOrCreate() when item needs to be created.
+                var p = things.fetchOrCreate('d', {name: 'Four'}).
+                    then(function(four){
+                        t.ok(four instanceof onfire.model.Model,
+                            '.fetchOrCreate() resolves to a Model instance');
+                        t.equal(four.name(), 'Four', '.fetchOrCreate() initialises new member correctly');
+                        t.equal(things.count(), 4, 'count() has been incremented by 1');
+
+                        // Retrieve newly created item from the collection.
+                        var p = things.fetch('d').
+                            then(function(four) {
+                                t.ok(four instanceof onfire.model.Model,
+                                    '.fetchOrCreate() places a Model instance in the collection');
+                                t.equal(four.name(), 'Four',
+                                    '.fetchOrCreate() places correctly initialised model in the collection');
+                            });
+                        ref.flush();
+                        return p;
+                    });
+                ref.flush();
+                setTimeout(function() {
+                    ref.flush()
+                });
+                return p;
             }).
             then(function() {
                 // Test .fetchOrCreate() when item already exists.
+                var p = things.fetchOrCreate('d', {name: 'Five'}).
+                    then(function(four){
+                        t.ok(four instanceof onfire.model.Model,
+                            '.fetchOrCreate() resolves to an existing Model instance');
+                        t.equal(four.name(), 'Four',
+                            '.fetchOrCreate() does not change an existing model');
+                        t.equal(things.count(), 4, 'count() has not been incremented');
+                    }, function(err) {
+                        t.error(err, '.fetchOrCreate() failed');
+                    });
+                ref.flush();
+                setTimeout(function() {
+                    ref.flush()
+                });
+                return p;
+            }).
+            then(function() {
+                // Test .remove()
+                var p = things.remove('d').
+                    then(function() {
+                        t.equal(things.count(), 3, 'count() has been decremented');
+                    }, function(err) {
+                        t.error(err, '.remove() failed');
+                    });
+                ref.flush();
+                setTimeout(function() {
+                    ref.flush()
+                });
+                return p;
+            }).
+            then(function() {
+                // Test .remove() a non-existent item.
+                var p = things.remove('c').
+                    then(function() {
+                        t.equal(things.count(), 3, 'count() has not been decremented');
+                    }, function(err) {
+                        t.error(err, '.remove() a non-existent member should not reject with an error');
+                    });
+                return p;
             }).
             then(function() {
                 t.end();
@@ -289,6 +351,5 @@ test('Read Permission Denied', function(t) {
     ref.flush();
 });
 
-// Add, remove
 // forEach
 // Does it pick up added/removed items?

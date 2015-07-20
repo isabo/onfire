@@ -3,14 +3,14 @@ OnFire is a general purpose library that makes it easier to develop and maintain
 whether they are browser-based or run on Node.js, which have complex data structures.
 
 Already implemented:
-* Schema-driven, live models. Where appropriate, property values are also models, automatically.
-* It makes a lot of Promises, instead of actually calling you back. :-)
+* Schema-driven, live **models**. Where appropriate, property values are also models, automatically.
+* Makes **Promises**, instead of actually calling you back. :laughing:
 
 Coming soon:
 * Loose coupling between locally triggered "chain-reaction" operations, allowing more
   compartmentalization and less spaghetti code. The most common use-case for this is for building
   indexes that take care of themselves.
-* Persistence! This is for loading data while offline, or for priming your app for a quick start.
+* **Persistence!** This is for loading data while offline, or for priming your app for a quick start.
 
 Here are [more details](https://github.com/isabo/onfire/wiki/OnFire-Goals-&-Requirements).
 

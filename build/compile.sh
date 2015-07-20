@@ -25,3 +25,6 @@ java -server -jar ../node_modules/google-closure-compiler/compiler.jar \
 --js '!../src/externs/**.js' \
 --js '!../node_modules/google-closure-library/closure/goog/**_test.js' \
 --js '!../node_modules/google-closure-library/closure/goog/demos/**.js'
+
+echo "Copying externs ..."
+cp ../src/externs/outgoing/*.js ../dist

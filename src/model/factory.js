@@ -6,11 +6,12 @@ goog.require('onfire.model.Collection');
 
 
 /**
- * Generate a subclass of onfire.model.Model or onfire.model.Collection with a baked in schema.
+ * Generates a subclass of onfire.model.Model or onfire.model.Collection with a baked in schema.
  *
  * @param {!Object|!function(new:onfire.model.Model, !onfire.Ref)} schemaOrCtor A schema object or
  *      a reference to a predefined Model subclass constructor.
  * @return {!function(new:onfire.model.Model, !onfire.Ref)}
+ * @throws {Error}
  */
 onfire.model.factory.defineModel = function(schemaOrCtor) {
 

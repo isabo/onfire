@@ -231,9 +231,10 @@ onfire.model.Model.prototype.stopMonitoring_ = function() {
 
 
 /**
- * Return a promise that is resolved to this instance when the data has been loaded.
+ * Returns a promise that is resolved to this instance when the data has been loaded.
  *
- * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>}
+ * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
+ *      promise resolves to this instance when the data has been loaded.
  * @export
  */
 onfire.model.Model.prototype.whenLoaded = function() {
@@ -243,9 +244,9 @@ onfire.model.Model.prototype.whenLoaded = function() {
 
 
 /**
- * Return the ID of the model.
+ * Returns the key of the model's reference.
  *
- * @return {string}
+ * @return {string} The key of the model's reference
  * @export
  */
 onfire.model.Model.prototype.key = function() {
@@ -255,10 +256,10 @@ onfire.model.Model.prototype.key = function() {
 
 
 /**
- * Determine whether the underlying data exists. We may have retrieved a non-existent object, or
+ * Determines whether the underlying data exists. We may have retrieved a non-existent object, or
  * it may have subsequently been deleted.
  *
- * @return {boolean}
+ * @return {boolean} Whether the underlying data actually exists.
  * @export
  */
 onfire.model.Model.prototype.exists = function() {
@@ -281,11 +282,19 @@ onfire.model.Model.prototype.handleValue = function(newValue) {
 
 
 /**
- * Get the value stored under a key.
+ * Synchronously retrieves the value associated with a key. If the value is not a primitive, a model
+ * instance will be returned, in which case .whenLoaded() should be called on the returned model in
+ * order to know when it is ready to use. If the key is already known to represent a model, it is
+ * better to obtain it via the asynchronous .fetch() method.
+ * If the key is specified in the schema, its value, or a model representing its value,  will be
+ * returned. If the key represents a primitive but missing value, the return value will be null.
+ * If the key is not specified in the schema, but does have a value in the underlying data, that
+ * value will be returned. Otherwise, an exception will be thrown.
  *
  * @param {string} key
- * @return {Firebase.Value|onfire.model.Model}
+ * @return {Firebase.Value|onfire.model.Model} A primitive value or a model instance.
  * @export
+ * @throws {Error}
  */
 onfire.model.Model.prototype.get = function(key) {
 
@@ -299,13 +308,17 @@ onfire.model.Model.prototype.get = function(key) {
 
 
 /**
- * Get a primitive value or an object that is not wrapped by an onfire.model.Model instance.
- * If the key exists, return its value, regardless of whether the schema specifies it. Otherwise,
- * return null, or throw an exception if the key is not specified in the schema.
+ * Synchronously retrieves the primitive value associated with a key. If the value is an object, it
+ * is returned unwrapped, i.e. not as a model instance.
+ * If the key is specified in the schema, its value will be returned. If the key does not have a
+ * value the return value will be null.
+ * If the key is not specified in the schema, but does have a value in the underlying data, that
+ * value will be returned. Otherwise, an exception will be thrown.
  *
  * @param {string} key The key under which the value is stored.
- * @return {Firebase.Value}
+ * @return {Firebase.Value} The value or unwrapped object associated with the key.
  * @export
+ * @throws {Error}
  */
 onfire.model.Model.prototype.getBasicValue = function(key) {
 
@@ -326,11 +339,16 @@ onfire.model.Model.prototype.getBasicValue = function(key) {
 
 
 /**
- * Get the model instance that represents the value stored under a key.
+ * Synchronously retrieves the model instance that represents a non-primitive value that is
+ * associated with a key. Make sure to call .whenLoaded() on the returned model in order to know when
+ * it is ready to use. In many cases it may be more convenient to call the asynchronous .fetch()
+ * method instead.
+ * If the key is not specified in the schema, an exception will be thrown.
  *
  * @param {string} key
  * @return {!onfire.model.Model}
  * @export
+ * @throws {Error}
  */
 onfire.model.Model.prototype.getModel = function(key) {
 
@@ -344,13 +362,18 @@ onfire.model.Model.prototype.getModel = function(key) {
 
 
 /**
- * Change the primitive value of a property. Returns a a reference to the current model to allow
- * chaining.
+ * Registers the desire to change the primitive value associated with a key. The value will be
+ * committed only when .save() is called. Returns a a reference to the current model to allow
+ * chaining, e.g.,
+ *      person.set('firstName', 'John').set('lastName', 'Smith').save()
+ * Throws an error if the key is not specified in the schema and does not already have a value in
+ * the underlying data.
  *
  * @param {string} key The name of a property.
  * @param {Firebase.Value} value The primitive value to assign to the property.
- * @return {!onfire.model.Model}
+ * @return {!onfire.model.Model} This model instance, in order to make the method chainable.
  * @export
+ * @throws {Error}
  */
 onfire.model.Model.prototype.set = function(key, value) {
 
@@ -381,9 +404,9 @@ onfire.model.Model.prototype.isKeySpecified_ = function(key) {
 
 
 /**
- * Whether there are any usaved changes on this model.
+ * Determines whether there are any usaved changes on this model.
  *
- * @return {boolean}
+ * @return {boolean} Whether there are any usaved changes on this model.
  * @export
  */
 onfire.model.Model.prototype.hasChanges = function() {
@@ -393,9 +416,11 @@ onfire.model.Model.prototype.hasChanges = function() {
 
 
 /**
- * Commit the outstanding changes.
+ * Asynchronously commits the outstanding changes.
  *
- * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>}
+ * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
+ *      promise that resolves to this model instance when the operation completes successfully, or
+ *      is rejected with an error.
  * @export
  */
 onfire.model.Model.prototype.save = function() {
@@ -415,11 +440,12 @@ onfire.model.Model.prototype.save = function() {
 
 
 /**
- * Change the primitive value of a set of properties atomically.
+ * Asynchronously and atomically changes the primitive values of a set of keys.
  *
- * @param {!Object<string,Firebase.Value>} pairs An object containing the property/value pairs to
- *        update.
- * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>}
+ * @param {!Object<string,Firebase.Value>} pairs An object containing the key/value pairs to update.
+ * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
+ *      promise that resolves to this model instance when the operation completes successfully, or
+ *      is rejected with an error.
  * @protected
  */
 onfire.model.Model.prototype.update = function(pairs) {
@@ -466,7 +492,7 @@ onfire.model.Model.prototype.update = function(pairs) {
 
 
 /**
- * Sets values if the current object does not exist. Uses a transaction.
+ * Sets values if the current object does not exist in the underlying database. Uses a transaction.
  *
  * @param {!Object} values A set of property/value pairs.
  * @return

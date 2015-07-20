@@ -8,14 +8,15 @@ goog.require('goog.object');
 
 
 /**
- * Base class for collections (object maps) that live in Firebase.
+ * Base class for collections that live in Firebase. If collection members are not primitives, they
+ * are lazily loaded -- only when requested.
  *
  * @param {!onfire.Ref} ref The reference of the current object.
- * @param {!function(new:onfire.model.Model, !onfire.Ref, number=)=} opt_memberCtor The constructor
- *      to use for instances of collection members.
+ * @param {!function(new:onfire.model.Model, !onfire.Ref, number=)=} opt_memberCtor The model
+ *      constructor to use for instances of collection members. If the members are primitives,
+ *      this should not be supplied.
  * @constructor
  * @extends {onfire.model.Model}
- * @template T
  * @export
  */
 onfire.model.Collection = function(ref, opt_memberCtor) {
@@ -34,7 +35,7 @@ goog.inherits(onfire.model.Collection, onfire.model.Model);
 
 
 /**
- * Load the initial data and watch for changes.
+ * Loads the initial data and starts listening for changes.
  *
  * @override
  * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>}
@@ -74,12 +75,15 @@ onfire.model.Collection.prototype.whenLoaded;
 
 
 /**
- * Get the value corresponding to an ID. If the value is a model, it is better to call .fetch()
- * which returns a promise that resolves when the model is fully loaded and ready to use.
+ * Synchronously retrieves the value associated with a key. If the collection members are not
+ * primitive values, a model instance will be returned, in which case .whenLoaded() should be called
+ * on the returned model in order to know when it is ready to use. Consider using the asynchronous
+ * .fetch() method instead.
+ * Throws an exception if the key does not have a value in the underlying data.
  *
  * @override
  * @param {string} key An key of an item in the collection.
- * @return {Firebase.Value|onfire.model.Model}
+ * @return {Firebase.Value|onfire.model.Model} A primitive value or a model instance.
  * @export
  */
 onfire.model.Collection.prototype.get = function(key) {
@@ -89,13 +93,15 @@ onfire.model.Collection.prototype.get = function(key) {
 
 
 /**
- * Return a model instance to represent the item whose ID is provided. Note that the model will
- * only be ready to use once its .whenLoaded() promise has resolved. In most cases, it would be
- * easier to call .fetch() which is shorthand for the above.
+ * Synchronously retrieves the value associated with a key and wraps it in a model instance. Make
+ * sure to call .whenLoaded() on the returned model in order to know when it is ready to use.
+ * Consider using the asynchronous .fetch() method instead.
+ * Throws an exception if the key does not have a value in the underlying data.
  *
  * @param {string} key The key of the desired item.
- * @return {!onfire.model.Model}
+ * @return {!onfire.model.Model} A model instance.
  * @export
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.getModel = function(key) {
 
@@ -103,7 +109,7 @@ onfire.model.Collection.prototype.getModel = function(key) {
         if (this.containsKey(key)) {
             return new this.memberCtor_(this.ref.child(key));
         } else {
-            throw new Error('No such key in theis collection: ' + key);
+            throw new Error('No such key in this collection: ' + key);
         }
     } else {
         throw new Error('Cannot create a model for a primitive value');
@@ -112,11 +118,14 @@ onfire.model.Collection.prototype.getModel = function(key) {
 
 
 /**
- * Get a primitive value or an object that is not wrapped by an onfire.model.Model instance.
+ * Synchronously retrieves the primitive value associated with a key. If the value is an object, it
+ * is returned unwrapped, i.e. not as a model instance.
+ * Throws an exception if the key does not have a value in the underlying data.
  *
  * @param {string} key The key of the desired value.
  * @return {Firebase.Value}
  * @export
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.getBasicValue = function(key) {
 
@@ -129,8 +138,12 @@ onfire.model.Collection.prototype.getBasicValue = function(key) {
 
 
 /**
- * Change the primitive value of a property. Returns a a reference to the current model to allow
- * chaining.
+ * Registers the desire to change the primitive value associated with a key. The value will be
+ * committed only when .save() is called. Returns a a reference to the current model to allow
+ * chaining, e.g.,
+ *      person.set('firstName', 'John').set('lastName', 'Smith').save()
+ * Throws an error if the key is not specified in the schema and does not already have a value in
+ * the underlying data.
  *
  * @override return type.
  * @param {string} key The name of a property.
@@ -173,11 +186,14 @@ onfire.model.Collection.prototype.update;
 
 
 /**
- * Instantiate a specified item.
+ * Asynchronously retrieves a model instance that represents a member of the collection. Throws an
+ * exception if the key does not exist.
  *
  * @param {string} key The key of the member.
- * @return {!Promise<!T,!Error>|!goog.Promise<!T,!Error>}
+ * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
+ *      promise that resolves to a model instance, or is rejected with an error.
  * @export
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.fetch = function(key) {
 
@@ -186,11 +202,13 @@ onfire.model.Collection.prototype.fetch = function(key) {
 
 
 /**
- * Instantiate a new, empty item, which, when written to, will become a member of the collection.
+ * Asynchronously creates a model instance and adds it as a member of the collection, with an
+ * automatically generated key.
  *
  * @param {!Object<string,Firebase.Value>=} opt_values An object containing the property/value pairs
- *        to set.
- * @return {!Promise<!T,!Error>|!goog.Promise<!T,!Error>}
+ *        to initialize the new object with.
+ * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
+ *      promise that resolves to a model instance, or is rejected with an error.
  * @export
  */
 onfire.model.Collection.prototype.create = function(opt_values) {
@@ -214,12 +232,15 @@ onfire.model.Collection.prototype.create = function(opt_values) {
 
 
 /**
- * Fetch an item by its key, or create it if it does not yet exist, and use the provided key.
+ * Asynchronously retrieves an existing item by its key, or creates it if it does not yet exist, and
+ * adds it to the collection.
  *
  * @param {string} key
- * @param {Object} values A set of property/value pairs to assign if created. If null, don't set
- *      any values. The object will come into existence only when a value is set.
- * @return {!Promise<!T,!Error>|!goog.Promise<!T,!Error>}
+ * @param {!Object<string,Firebase.Value>=} values A set of property/value pairs to assign if
+ *      created. If null, don't set any values. The object will come into existence only when a
+ *      value is set and committed to the database.
+ * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
+ *      promise that resolves to a model instance, or is rejected with an error.
  * @export
  */
 onfire.model.Collection.prototype.fetchOrCreate = function(key, values) {
@@ -247,11 +268,12 @@ onfire.model.Collection.prototype.fetchOrCreate = function(key, values) {
 
 
 /**
- * Remove the specified member of the collection. The promise is not rejected if the member is not
- * present.
+ * Asynchronously removes the specified member of the collection. The promise is not rejected if the
+ * member is not present.
  *
  * @param {string} key The key of the member.
- * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>}
+ * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise that resolves when the
+ *      operation is complete, or is rejected with an error.
  * @export
  */
 onfire.model.Collection.prototype.remove = function(key) {
@@ -288,12 +310,17 @@ onfire.model.Collection.prototype.remove = function(key) {
 
 
 /**
- * Perform an operation on each member of the collection.
+ * Calls a callback for each member of the collection. Returns a promise that is resolved once all
+ * the callbacks have been invoked, and any promises returned by callbacks have themselves been
+ * resolved.
+ * The callback function should accept a primitive value or a model instance, according to the type
+ * of members in the collection. It does not need to return anything, but if it returns a promise,
+ * the main return value of this method (a promise) will depend on it.
  *
  * @param {
         !function((!onfire.model.Model|Firebase.Value), string=):(!Promise|!goog.Promise|undefined)
     } callback
- * @return {(!Promise|!goog.Promise)}
+ * @return {(!Promise|!goog.Promise)} A promise that in resolved when all callbacks have completed.
  * @export
  */
 onfire.model.Collection.prototype.forEach = function(callback) {
@@ -314,9 +341,9 @@ onfire.model.Collection.prototype.forEach = function(callback) {
 
 
 /**
- * Return the number of values.
+ * Returns the number of values in the collection.
  *
- * @return {number}
+ * @return {number} The number of values in the collection.
  * @export
  */
 onfire.model.Collection.prototype.count = function() {
@@ -339,9 +366,9 @@ onfire.model.Collection.prototype.containsKey = function(key) {
 
 
 /**
- * Return an array of the keys of items in the collection.
+ * Returns an array of the keys of members in the collection.
  *
- * @return {!Array<string>}
+ * @return {!Array<string>} An array of the keys of members in the collection.
  * @export
  */
 onfire.model.Collection.prototype.keys = function() {

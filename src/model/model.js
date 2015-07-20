@@ -96,7 +96,7 @@ onfire.model.Model = function(ref) {
 
 
 /**
- * Clean up.
+ * Releases resources used by the model. Call this when you no longer need the instance.
  *
  * @export
  */

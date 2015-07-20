@@ -219,12 +219,11 @@ onfire.Ref.prototype.update = function(values) {};
 /**
  * Generates a subclass of onfire.model.Model or onfire.model.Collection with a baked in schema.
  *
- * @param {!Object|!function(new:onfire.model.Model, !onfire.Ref)} schemaOrCtor A schema object or
- *      a reference to a predefined Model subclass constructor.
- * @return {!function(new:onfire.model.Model, !onfire.Ref)}
+ * @param {!Object} schema A schema object.
+ * @return {!function(new:onfire.model.Model, !onfire.Ref)} A model constructor.
  * @throws {Error}
  */
-onfire.defineModel = function(schemaOrCtor) {};
+onfire.defineModel = function(schema) {};
 
 
 
@@ -239,7 +238,7 @@ onfire.model.Model = function(ref) {};
 
 
 /**
- * Clean up.
+ * Releases resources used by the model. Call this when you no longer need the instance.
  */
 onfire.model.Model.prototype.dispose = function() {};
 

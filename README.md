@@ -319,12 +319,11 @@ onfire.Ref.prototype.update = function(values) {};
 /**
  * Generates a subclass of onfire.model.Model or onfire.model.Collection with a baked in schema.
  *
- * @param {!Object|!function(new:onfire.model.Model, !onfire.Ref)} schemaOrCtor A schema object or
- *      a reference to a predefined Model subclass constructor.
- * @return {!function(new:onfire.model.Model, !onfire.Ref)}
+ * @param {!Object} schema A schema object.
+ * @return {!function(new:onfire.model.Model, !onfire.Ref)} A model constructor.
  * @throws {Error}
  */
-onfire.defineModel = function(schemaOrCtor) {};
+onfire.defineModel = function(schema) {};
 ```
 
 ### Model
@@ -339,7 +338,7 @@ onfire.model.Model = function(ref) {};
 
 
 /**
- * Clean up.
+ * Releases resources used by the model. Call this when you no longer need the instance.
  */
 onfire.model.Model.prototype.dispose = function() {};
 
@@ -452,6 +451,7 @@ onfire.model.Model.prototype.set = function(key, value) {};
 ```
 
 ### Collection
+Offers all the [Model](#model) properties with the following additions and changes.
 ```js
 /**
  * Base class for collections that live in Firebase. If collection members are not primitives, they
@@ -614,20 +614,6 @@ onfire.model.Collection.prototype.remove = function(key) {};
  * @return {!onfire.model.Collection}
  */
 onfire.model.Collection.prototype.set = function(key, value) {};
-
-
-/**
- * @override the return type.
- * @return {!onfire.model.Collection}
- */
-onfire.model.Collection.prototype.save;
-
-
-/**
- * @override the return type.
- * @return {!Promise<!onfire.model.Collection,!Error>|!goog.Promise<!onfire.model.Collection,!Error>}
- */
-onfire.model.Collection.prototype.whenLoaded;
 ```
 
 

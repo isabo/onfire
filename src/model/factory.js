@@ -10,7 +10,7 @@ goog.require('onfire.model.Collection');
  *
  * @param {!Object|!function(new:onfire.model.Model, !onfire.Ref)} schemaOrCtor A schema object or
  *      a reference to a predefined Model subclass constructor.
- * @return {!function(new:onfire.model.Model, !onfire.Ref)}
+ * @return {!function(new:onfire.model.Model, !onfire.Ref)} A model constructor.
  * @throws {Error}
  */
 onfire.model.factory.defineModel = function(schemaOrCtor) {

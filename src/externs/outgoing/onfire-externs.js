@@ -43,8 +43,8 @@ onfire.Ref.prototype.key = function() {};
  * Deregisters a previously registered callback.
  * @see https://www.firebase.com/docs/web/api/query/off.html
  *
- * @param {onfire.utils.firebase.EventType=} opt_eventType
- * @param {!Firebase.EventCallback=} opt_callback If provided, this MUST be the __wrapped__ callback
+ * @param {string=} opt_eventType
+ * @param {!Firebase.EventCallback=} opt_callback If provided, this MUST be the *wrapped* callback
  *      returned by the .on() method.
  * @param {!Object=} opt_context
  */
@@ -54,7 +54,7 @@ onfire.Ref.prototype.off = function(opt_eventType, opt_callback, opt_context) {}
 /**
  * Deregisters a previously registered .onValue() callback.
  *
- * @param {!function(Firebase.Value)} callback This MUST be the __wrapped__ callback returned
+ * @param {!function(Firebase.Value)} callback This MUST be the *wrapped* callback returned
  *      by .onValue().
  * @param {!Object=} context
  */
@@ -66,7 +66,7 @@ onfire.Ref.prototype.offValue = function(callback, context) {};
  * the return value for use when turning this off -- see the off() method.
  * @see https://www.firebase.com/docs/web/api/query/on.html
  *
- * @param {onfire.utils.firebase.EventType} eventType
+ * @param {string} eventType
  * @param {!Firebase.EventCallback} callback
  * @param {function(!Error)=} cancelCallback
  * @param {Object=} context
@@ -81,7 +81,7 @@ onfire.Ref.prototype.on = function(eventType, callback, cancelCallback, context)
  * of Firebase's .once() method.
  * @see https://www.firebase.com/docs/web/api/query/once.html
  *
- * @param {onfire.utils.firebase.EventType} eventType
+ * @param {string} eventType
  * @return {!Promise<!Firebase.DataSnapshot,!Error>|!goog.Promise<!Firebase.DataSnapshot,!Error>} A
  *      promise that resolves to a Firebase snapshot, or is rejected with an error.
  */

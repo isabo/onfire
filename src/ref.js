@@ -71,7 +71,7 @@ onfire.Ref.prototype.key = function() {
  * @see https://www.firebase.com/docs/web/api/query/off.html
  *
  * @param {onfire.utils.firebase.EventType=} opt_eventType
- * @param {!Firebase.EventCallback=} opt_callback If provided, this MUST be the __wrapped__ callback
+ * @param {!Firebase.EventCallback=} opt_callback If provided, this MUST be the *wrapped* callback
  *      returned by the .on() method.
  * @param {!Object=} opt_context
  * @export
@@ -85,7 +85,7 @@ onfire.Ref.prototype.off = function(opt_eventType, opt_callback, opt_context) {
 /**
  * Deregisters a previously registered .onValue() callback.
  *
- * @param {!function(Firebase.Value)} callback This MUST be the __wrapped__ callback returned
+ * @param {!function(Firebase.Value)} callback This MUST be the *wrapped* callback returned
  *      by .onValue().
  * @param {!Object=} context
  * @export

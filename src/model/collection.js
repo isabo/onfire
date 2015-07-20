@@ -389,8 +389,12 @@ onfire.model.Collection.prototype.handleChildAdded_ = function(snapshot) {
         this.storageObj = {};
     }
 
-    this.storageObj[snapshot.key()] = snapshot.val();
-    this.childrenCount++;
+    var key = snapshot.key();
+    var incrementNeeded = !this.containsKey(key);
+    this.storageObj[key] = snapshot.val();
+    if (incrementNeeded) {
+        this.childrenCount++;
+    }
 };
 
 

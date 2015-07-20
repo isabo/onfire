@@ -315,15 +315,6 @@ onfire.model.Model.prototype.key = function() {};
 
 
 /**
- * Returns a promise that is resolved to this instance when the data has been loaded.
- *
- * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
- *      promise resolves to this instance when the data has been loaded.
- */
-onfire.model.Model.prototype.whenLoaded = function() {};
-
-
-/**
  * Asynchronously commits the outstanding changes.
  *
  * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
@@ -348,6 +339,15 @@ onfire.model.Model.prototype.save = function() {};
  * @throws {Error}
  */
 onfire.model.Model.prototype.set = function(key, value) {};
+
+
+/**
+ * Returns a promise that is resolved to this instance when the data has been loaded.
+ *
+ * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
+ *      promise resolves to this instance when the data has been loaded.
+ */
+onfire.model.Model.prototype.whenLoaded = function() {};
 
 
 

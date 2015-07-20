@@ -332,7 +332,7 @@ onfire.model.Collection.prototype.forEach = function(callback) {
 
         var p = this.memberCtor_ ?
             this.fetch(key) : onfire.utils.promise.resolve(this.getBasicValue(key));
-        p.then(function(/** !onfire.model.Model|Firebase.Value */item) {
+        p = p.then(function(/** !onfire.model.Model|Firebase.Value */item) {
                 return callback.call(null, item, key);
             });
         promises.push(p);

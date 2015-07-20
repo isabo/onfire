@@ -10,18 +10,22 @@ goog.require('goog.Uri');
  * An analogue of a Firebase reference.
  * @see https://www.firebase.com/docs/web/api/firebase/constructor.html
  *
- * @param {!Firebase} ref
+ * @param {string|!Firebase} urlOrRef A Firebase URL or a Firebase reference instance.
  * @constructor
  * @final
  * @export
  */
-onfire.Ref = function(ref) {
+onfire.Ref = function(urlOrRef) {
+
+    if (typeof urlOrRef === 'string') {
+        urlOrRef = onfire.utils.firebase.newFirebase(urlOrRef);
+    }
 
     /**
      * @type {!Firebase}
      * @private
      */
-    this.ref_ = ref;
+    this.ref_ = urlOrRef;
 };
 
 

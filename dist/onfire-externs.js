@@ -2,11 +2,11 @@
  * An analogue of a Firebase reference.
  * @see https://www.firebase.com/docs/web/api/firebase/constructor.html
  *
- * @param {!Firebase} ref
+ * @param {string|!Firebase} urlOrRef A Firebase URL or a Firebase reference instance.
  * @constructor
  * @final
  */
-onfire.Ref = function(ref) {};
+onfire.Ref = function(urlOrRef) {};
 
 
 /**
@@ -299,9 +299,9 @@ onfire.model.Model.prototype.getModel = function(key) {};
 
 
 /**
- * Determines whether there are any usaved changes on this model.
+ * Determines whether there are any unsaved changes on this model.
  *
- * @return {boolean} Whether there are any usaved changes on this model.
+ * @return {boolean} Whether there are any unsaved changes on this model.
  */
 onfire.model.Model.prototype.hasChanges = function() {};
 

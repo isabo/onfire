@@ -9,6 +9,20 @@ var child = ref.child('x').child('y');
 var pushedRef;
 
 
+test('onfire.Ref constructor', function(t) {
+
+    var urlRef;
+    t.doesNotThrow(function(){urlRef = new onfire.Ref('https://example.firebaseio.com')}, Error,
+        'Accepts valid Firebase URL');
+    t.ok(urlRef.ref() instanceof MockFirebase, 'Creates Firebase instance');
+
+    var ref;
+    t.doesNotThrow(function(){ref = new onfire.Ref(fb)}, Error, 'Accepts Firebase ref');
+    t.equal(ref.ref(), fb, 'Uses Firebase instance');
+    t.end();
+});
+
+
 test('onfire.Ref - basic ops', function (t) {
 
     t.equal(ref.key(), null, 'onfire.Ref.key() returns null for the root');

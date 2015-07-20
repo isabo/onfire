@@ -183,8 +183,8 @@ onfire.Ref.prototype.on = function(eventType, callback, cancelCallback, context)
  * @see https://www.firebase.com/docs/web/api/query/once.html
  *
  * @param {string} eventType
- * @return {!Promise<!Firebase.DataSnapshot,!Error>|!goog.Promise<!Firebase.DataSnapshot,!Error>} A
- *      promise that resolves to a Firebase snapshot, or is rejected with an error.
+ * @return {!Promise<!Firebase.DataSnapshot,!Error>} A promise that resolves to a Firebase snapshot,
+ *      or is rejected with an error.
  */
 onfire.Ref.prototype.once = function(eventType) {};
 
@@ -193,7 +193,7 @@ onfire.Ref.prototype.once = function(eventType) {};
  * Retrieves the value that is stored at the current location. This is shorthand for calling .once()
  * for the 'value' event and then extracting the value of the returned snapshot.
  *
- * @return {!Promise<Firebase.Value,!Error>|!goog.Promise<Firebase.Value,!Error>} A promise that
+ * @return {!Promise<Firebase.Value,!Error>} A promise that
  *      resolves to the value stored at the current location, or is rejected with an error.
  */
 onfire.Ref.prototype.onceValue = function() {};
@@ -237,8 +237,8 @@ onfire.Ref.prototype.path = function() {};
  * @see https://www.firebase.com/docs/web/api/firebase/push.html
  *
  * @param {Firebase.Value=} opt_value
- * @return {!Promise<!onfire.Ref,!Error>|!goog.Promise<!onfire.Ref,!Error>} A promise that resolves
- *      to the Ref of the newly pushed child.
+ * @return {!Promise<!onfire.Ref,!Error>} A promise that resolves to the Ref of the newly pushed
+ *      child.
  */
 onfire.Ref.prototype.push = function(opt_value) {};
 
@@ -257,8 +257,8 @@ onfire.Ref.prototype.ref = function() {};
  * .remove() method.
  * @see https://www.firebase.com/docs/web/api/firebase/remove.html
  *
- * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise that resolves when the
- *      operation is complete, or is rejected with an error.
+ * @return {!Promise<null,!Error>} A promise that resolves when the operation is complete, or is
+ *      rejected with an error.
  */
 onfire.Ref.prototype.remove = function() {};
 
@@ -278,8 +278,8 @@ onfire.Ref.prototype.root = function() {};
  * @see https://www.firebase.com/docs/web/api/firebase/set.html
  *
  * @param {Firebase.Value} value
- * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise that resolves when the
- *      operation is complete, or is rejected with an error.
+ * @return {!Promise<null,!Error>} A promise that resolves when the operation is complete, or is
+ *      rejected with an error.
  */
 onfire.Ref.prototype.set = function(value) {};
 
@@ -290,15 +290,11 @@ onfire.Ref.prototype.set = function(value) {};
  * @see https://www.firebase.com/docs/web/api/firebase/transaction.html
  *
  * @param {Firebase.TransactionUpdateFunction} updateFn
- * @return
-    {
-        !Promise<!{{isCommitted:boolean,snapshot:Firebase.DataSnapshot}},!Error>
-        |
-        !goog.Promise<!{{isCommitted:boolean,snapshot:Firebase.DataSnapshot}},!Error>
-    } A promise that resolves when the operation is complete, or is rejected with an error. The
-    value provided when the promise resolves is an object with two properties:
-        isCommitted: whether the operation actually committed a value to the database.
-        snapshot: a snapshot of the current data.
+ * @return {!Promise<!{{isCommitted:boolean,snapshot:Firebase.DataSnapshot}},!Error>} A promise that
+ *      resolves when the operation is complete, or is rejected with an error. The value provided
+ *      when the promise resolves is an object with two properties:
+ *          isCommitted: whether the operation actually committed a value to the database.
+ *          snapshot: a snapshot of the current data.
  */
 onfire.Ref.prototype.transaction = function(updateFn) {};
 
@@ -309,8 +305,8 @@ onfire.Ref.prototype.transaction = function(updateFn) {};
  * @see https://www.firebase.com/docs/web/api/firebase/update.html
  *
  * @param {!Object<string,Firebase.Value>} values An object containing the key/value pairs.
- * @return {!Promise<null,!Error>|goog.Promise<null,!Error>} A promise that resolves when the
- *      operation is complete, or is rejected with an error.
+ * @return {!Promise<null,!Error>} A promise that resolves when the operation is complete, or is
+ *      rejected with an error.
  */
 onfire.Ref.prototype.update = function(values) {};
 ```
@@ -402,7 +398,7 @@ onfire.model.Model.prototype.getModel = function(key) {};
 /**
  * Determines whether there are any usaved changes on this model.
  *
- * @return {boolean} Whether there are any usaved changes on this model.
+ * @return {boolean} Whether there are any unsaved changes on this model.
  */
 onfire.model.Model.prototype.hasChanges = function() {};
 
@@ -418,9 +414,8 @@ onfire.model.Model.prototype.key = function() {};
 /**
  * Asynchronously commits the outstanding changes.
  *
- * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
- *      promise that resolves to this model instance when the operation completes successfully, or
- *      is rejected with an error.
+ * @return {!Promise<!onfire.model.Model,!Error>} A promise that resolves to this model instance
+ *      when the operation completes successfully, or is rejected with an error.
  */
 onfire.model.Model.prototype.save = function() {};
 
@@ -445,8 +440,8 @@ onfire.model.Model.prototype.set = function(key, value) {};
 /**
  * Returns a promise that is resolved to this instance when the data has been loaded.
  *
- * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
- *      promise resolves to this instance when the data has been loaded.
+ * @return {!Promise<!onfire.model.Model,!Error>} A promise resolves to this instance when the data
+ *      has been loaded.
  */
 onfire.model.Model.prototype.whenLoaded = function() {};
 ```
@@ -493,8 +488,8 @@ onfire.model.Collection.prototype.count = function() {};
  *
  * @param {!Object<string,Firebase.Value>=} opt_values An object containing the property/value pairs
  *        to initialize the new object with.
- * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
- *      promise that resolves to a model instance, or is rejected with an error.
+ * @return {!Promise<!onfire.model.Model,!Error>} A promise that resolves to a model instance, or is
+ *      rejected with an error.
  */
 onfire.model.Collection.prototype.create = function(opt_values) {};
 
@@ -504,8 +499,8 @@ onfire.model.Collection.prototype.create = function(opt_values) {};
  * exception if the key does not exist.
  *
  * @param {string} key The key of the member.
- * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
- *      promise that resolves to a model instance, or is rejected with an error.
+ * @return {!Promise<!onfire.model.Model,!Error>} A promise that resolves to a model instance, or is
+ *      rejected with an error.
  * @throws {Error}
  */
 onfire.model.Collection.prototype.fetch = function(key) {};
@@ -519,8 +514,8 @@ onfire.model.Collection.prototype.fetch = function(key) {};
  * @param {!Object<string,Firebase.Value>=} values A set of property/value pairs to assign if
  *      created. If null, don't set any values. The object will come into existence only when a
  *      value is set and committed to the database.
- * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
- *      promise that resolves to a model instance, or is rejected with an error.
+ * @return {!Promise<!onfire.model.Model,!Error>} A promise that resolves to a model instance, or is
+ *      rejected with an error.
  */
 onfire.model.Collection.prototype.fetchOrCreate = function(key, values) {};
 
@@ -533,10 +528,8 @@ onfire.model.Collection.prototype.fetchOrCreate = function(key, values) {};
  * of members in the collection. It does not need to return anything, but if it returns a promise,
  * the main return value of this method (a promise) will depend on it.
  *
- * @param {
-        !function((!onfire.model.Model|Firebase.Value), string=):(!Promise|!goog.Promise|undefined)
-    } callback
- * @return {(!Promise|!goog.Promise)} A promise that in resolved when all callbacks have completed.
+ * @param {!function((!onfire.model.Model|Firebase.Value), string=):(!Promise|undefined)} callback
+ * @return {!Promise} A promise that in resolved when all callbacks have completed.
  */
 onfire.model.Collection.prototype.forEach = function(callback) {};
 
@@ -595,8 +588,8 @@ onfire.model.Collection.prototype.keys = function() {};
  * member is not present.
  *
  * @param {string} key The key of the member.
- * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise that resolves when the
- *      operation is complete, or is rejected with an error.
+ * @return {!Promise<null,!Error>} A promise that resolves when the operation is complete, or is
+ *      rejected with an error.
  */
 onfire.model.Collection.prototype.remove = function(key) {};
 

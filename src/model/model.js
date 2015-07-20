@@ -404,9 +404,9 @@ onfire.model.Model.prototype.isKeySpecified_ = function(key) {
 
 
 /**
- * Determines whether there are any usaved changes on this model.
+ * Determines whether there are any unsaved changes on this model.
  *
- * @return {boolean} Whether there are any usaved changes on this model.
+ * @return {boolean} Whether there are any unsaved changes on this model.
  * @export
  */
 onfire.model.Model.prototype.hasChanges = function() {

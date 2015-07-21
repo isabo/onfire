@@ -146,6 +146,167 @@ onfire.utils.firebase.once = function(ref, eventType) {
 
 
 /**
+ * Firebase.authWithCustomToken() wrapped in a promise.
+ *
+ * @param {string} authToken
+ * @param {!Object=} opt_options
+ * @return
+    {
+        !Promise<!Firebase.AuthCallbackData,!Error>
+        |
+        !goog.Promise<!Firebase.AuthCallbackData,!Error>
+    } A promise which resolves to the authData, or is rejected with an error.
+ */
+onfire.utils.firebase.authWithCustomToken = function(ref, authToken, opt_options) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        ref.authWithCustomToken(authToken,
+            function(/** Firebase.Error */err, /** Firebase.AuthCallbackData */authData){
+                !err ? resolve(authData) : reject(err);
+            }, opt_options);
+    });
+};
+
+
+/**
+ * Firebase.authAnonymously() wrapped in a promise.
+ *
+ * @param {!Firebase} ref
+ * @param {!Object=} opt_options
+ * @return
+    {
+     !Promise<!Firebase.AuthCallbackData,!Error>
+     |
+     !goog.Promise<!Firebase.AuthCallbackData,!Error>
+    } A promise which resolves to the authData, or is rejected with an error.
+ */
+onfire.utils.firebase.authAnonymously = function(ref, opt_options) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        ref.authAnonymously(
+            function(/** Firebase.Error */err, /** Firebase.AuthCallbackData */authData){
+                !err ? resolve(authData) : reject(err);
+            }, opt_options);
+    });
+};
+
+
+/**
+ * Firebase.authWithPassword() wrapped in a promise.
+ *
+ * @param {!Firebase} ref
+ * @param {!Firebase.AuthPasswordCredentials} credentials
+ * @param {!Object=} opt_options
+ * @return
+    {
+     !Promise<!Firebase.AuthCallbackData,!Error>
+     |
+     !goog.Promise<!Firebase.AuthCallbackData,!Error>
+    } A promise which resolves to the authData, or is rejected with an error.
+ */
+onfire.utils.firebase.authWithPassword = function(ref, credentials, opt_options) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        ref.authWithPassword(credentials,
+            function(/** Firebase.Error */err, /** Firebase.AuthCallbackData */authData){
+                !err ? resolve(authData) : reject(err);
+            }, opt_options);
+    });
+};
+
+
+/**
+ * Firebase.authWithOAuthPopup() wrapped in a promise.
+ *
+ * @param {!Firebase} ref
+ * @param {string} provider
+ * @param {!Object=} opt_options
+ * @return
+    {
+     !Promise<!Firebase.AuthCallbackData,!Error>
+     |
+     !goog.Promise<!Firebase.AuthCallbackData,!Error>
+    } A promise which resolves to the authData, or is rejected with an error.
+ */
+onfire.utils.firebase.authWithOAuthPopup = function(ref, provider, opt_options) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        ref.authWithOAuthPopup(provider,
+            function(/** Firebase.Error */err, /** Firebase.AuthCallbackData */authData){
+                !err ? resolve(authData) : reject(err);
+            }, opt_options);
+    });
+};
+
+
+/**
+ * Firebase.authWithOAuthRedirect() wrapped in a promise.
+ *
+ * @param {!Firebase} ref
+ * @param {string} provider
+ * @param {!Object=} opt_options
+ * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise which resolves to the
+ *      authData, or is rejected with an error.
+ */
+onfire.utils.firebase.authWithOAuthRedirect = function(ref, provider, opt_options) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        ref.authWithOAuthRedirect(provider,
+            function(/** !Firebase.Error */err){
+                reject(err);
+            }, opt_options);
+    });
+};
+
+
+/**
+ * Firebase.authWithOAuthToken() wrapped in a promise.
+ *
+ * @param {!Firebase} ref
+ * @param {string} provider
+ * @param {string|!Object} credentials
+ * @param {!Object=} opt_options
+ * @return
+    {
+     !Promise<!Firebase.AuthCallbackData,!Error>
+     |
+     !goog.Promise<!Firebase.AuthCallbackData,!Error>
+    } A promise which resolves to the authData, or is rejected with an error.
+ */
+onfire.utils.firebase.authWithOAuthToken = function(ref, provider, credentials, opt_options) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        ref.authWithOAuthToken(provider, credentials,
+            function(/** Firebase.Error */err, /** Firebase.AuthCallbackData */authData){
+                !err ? resolve(authData) : reject(err);
+            }, opt_options);
+    });
+};
+
+
+// /**
+//  * @return {Firebase.AuthCallbackData}
+//  * @nosideeffects
+//  */
+// onfire.utils.firebase.getAuth = function () {};
+//
+//
+// /**
+//  * @param {!function(Firebase.AuthCallbackData)} onComplete
+//  * @param {!Object=} context
+//  */
+// onfire.utils.firebase.onAuth = function (onComplete, context) {};
+//
+//
+// /**
+//  * @param {!function(Firebase.AuthCallbackData)} onComplete
+//  * @param {!Object=} context
+//  */
+// onfire.utils.firebase.offAuth = function (onComplete, context) {};
+//
+//
+// /**
+//  * (No documentation necessary.)
+//  */
+// onfire.utils.firebase.unauth = function () {};
+
+
+
+/**
  * @enum {string}
  */
 onfire.utils.firebase.EventType = {

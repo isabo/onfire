@@ -30,6 +30,175 @@ onfire.Ref = function(urlOrRef) {
 
 
 /**
+ * Firebase.authWithCustomToken() wrapped in a promise.
+ * @see https://www.firebase.com/docs/web/api/firebase/authwithcustomtoken.html
+ *
+ * @param {string} authToken
+ * @param {!Object=} opt_options
+ * @return
+    {
+        !Promise<!Firebase.AuthCallbackData,!Error>
+        |
+        !goog.Promise<!Firebase.AuthCallbackData,!Error>
+    } A promise which resolves to the authData, or is rejected with an error.
+ * @export
+ */
+onfire.Ref.prototype.authWithCustomToken = function(authToken, opt_options) {
+
+    return onfire.utils.firebase.authWithCustomToken(this.ref_, authToken, opt_options);
+};
+
+
+/**
+ * Firebase.authAnonymously() wrapped in a promise.
+ * @see https://www.firebase.com/docs/web/api/firebase/authanonymously.html
+ *
+ * @param {!Object=} opt_options
+ * @return
+    {
+     !Promise<!Firebase.AuthCallbackData,!Error>
+     |
+     !goog.Promise<!Firebase.AuthCallbackData,!Error>
+    } A promise which resolves to the authData, or is rejected with an error.
+ * @export
+ */
+onfire.Ref.prototype.authAnonymously = function(opt_options) {
+
+    return onfire.utils.firebase.authAnonymously(this.ref_, opt_options);
+};
+
+
+/**
+ * Firebase.authWithPassword() wrapped in a promise.
+ * @see https://www.firebase.com/docs/web/api/firebase/authwithpassword.html
+ *
+ * @param {!Firebase.AuthPasswordCredentials} credentials
+ * @param {!Object=} opt_options
+ * @return
+    {
+     !Promise<!Firebase.AuthCallbackData,!Error>
+     |
+     !goog.Promise<!Firebase.AuthCallbackData,!Error>
+    } A promise which resolves to the authData, or is rejected with an error.
+ * @export
+ */
+onfire.Ref.prototype.authWithPassword = function(credentials, opt_options) {
+
+    return onfire.utils.firebase.authWithPassword(this.ref_, credentials, opt_options);
+};
+
+
+/**
+ * Firebase.authWithOAuthPopup() wrapped in a promise.
+ * @see https://www.firebase.com/docs/web/api/firebase/authwithoauthpopup.html
+ *
+ * @param {string} provider
+ * @param {!Object=} opt_options
+ * @return
+    {
+     !Promise<!Firebase.AuthCallbackData,!Error>
+     |
+     !goog.Promise<!Firebase.AuthCallbackData,!Error>
+    } A promise which resolves to the authData, or is rejected with an error.
+ * @export
+ */
+onfire.Ref.prototype.authWithOAuthPopup = function(provider, opt_options) {
+
+    return onfire.utils.firebase.authWithOAuthPopup(this.ref_, provider, opt_options);
+};
+
+
+/**
+ * Firebase.authWithOAuthRedirect() wrapped in a promise.
+ * @see https://www.firebase.com/docs/web/api/firebase/authwithoauthredirect.html
+ *
+ * @param {string} provider
+ * @param {!Object=} opt_options
+ * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise which is rejected with an
+ *      error if the authentication fails.
+ * @export
+ */
+onfire.Ref.prototype.authWithOAuthRedirect = function(provider, opt_options) {
+
+    return onfire.utils.firebase.authWithOAuthRedirect(this.ref_, provider, opt_options);
+};
+
+
+/**
+ * Firebase.authWithOAuthToken() wrapped in a promise.
+ * @see https://www.firebase.com/docs/web/api/firebase/authwithoauthtoken.html
+ *
+ * @param {string} provider
+ * @param {string|!Object} credentials
+ * @param {!Object=} opt_options
+ * @return
+    {
+     !Promise<!Firebase.AuthCallbackData,!Error>
+     |
+     !goog.Promise<!Firebase.AuthCallbackData,!Error>
+    } A promise which resolves to the authData, or is rejected with an error.
+ * @export
+ */
+onfire.Ref.prototype.authWithOAuthToken = function(provider, credentials, opt_options) {
+
+    return onfire.utils.firebase.authWithOAuthToken(this.ref_, provider, credentials, opt_options);
+};
+
+
+/**
+ * A proxy for Firebase.getAuth().
+ * @see https://www.firebase.com/docs/web/api/firebase/getauth.html
+ *
+ * @return {Firebase.AuthCallbackData}
+ * @export
+ */
+onfire.Ref.prototype.getAuth = function() {
+
+    return this.ref_.getAuth();
+};
+
+
+/**
+ * A proxy for Firebase.onAuth().
+ * @see https://www.firebase.com/docs/web/api/firebase/onauth.html
+ *
+ * @param {!function(Firebase.AuthCallbackData)} onComplete
+ * @param {!Object=} opt_context
+ * @export
+ */
+onfire.Ref.prototype.onAuth = function(onComplete, opt_context) {
+
+    this.ref_.onAuth(onComplete, opt_context);
+};
+
+
+/**
+ * A proxy for Firebase.offAuth().
+ * @see https://www.firebase.com/docs/web/api/firebase/offauth.html
+ *
+ * @param {!function(Firebase.AuthCallbackData)} onComplete
+ * @param {!Object=} opt_context
+ * @export
+ */
+onfire.Ref.prototype.offAuth = function(onComplete, opt_context) {
+
+    this.ref_.offAuth(onComplete, opt_context);
+};
+
+
+/**
+ * A proxy for Firebase.unauth().
+ * @see https://www.firebase.com/docs/web/api/firebase/unauth.html
+ *
+ * @export
+ */
+onfire.Ref.prototype.unauth = function() {
+
+    this.ref_.unauth();
+};
+
+
+/**
  * Returns a reference that is relative to the current location.
  * @see https://www.firebase.com/docs/web/api/firebase/child.html
  *

@@ -278,32 +278,94 @@ onfire.utils.firebase.authWithOAuthToken = function(ref, provider, credentials, 
 };
 
 
-// /**
-//  * @return {Firebase.AuthCallbackData}
-//  * @nosideeffects
-//  */
-// onfire.utils.firebase.getAuth = function () {};
-//
-//
-// /**
-//  * @param {!function(Firebase.AuthCallbackData)} onComplete
-//  * @param {!Object=} context
-//  */
-// onfire.utils.firebase.onAuth = function (onComplete, context) {};
-//
-//
-// /**
-//  * @param {!function(Firebase.AuthCallbackData)} onComplete
-//  * @param {!Object=} context
-//  */
-// onfire.utils.firebase.offAuth = function (onComplete, context) {};
-//
-//
-// /**
-//  * (No documentation necessary.)
-//  */
-// onfire.utils.firebase.unauth = function () {};
+/**
+ * Firebase.createUser() wrapped in a promise.
+ *
+ * @param {!Firebase} ref
+ * @param {!Firebase.AuthPasswordCredentials} credentials
+ * @return {!Promise<!{uid:string},!Error>|!goog.Promise<!{uid:string},!Error>} A promise which
+ *      resolves to a userData object, or is rejected with an error.
+ */
+onfire.utils.firebase.createUser = function(ref, credentials) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        ref.createUser(credentials,
+            function(/** Firebase.Error */err, /** {uid:string} */userData){
+                !err ? resolve(userData) : reject(err);
+            });
+    });
+};
 
+
+/**
+ * Firebase.changeEmail() wrapped in a promise.
+ *
+ * @param {!Firebase} ref
+ * @param {!{oldEmail:string, password:string, newEmail:string}} credentials
+ * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise which resolves when the
+ *      operation is complete, or is rejected with an error.
+ */
+onfire.utils.firebase.changeEmail = function(ref, credentials) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        ref.changeEmail(credentials,
+            function(/** Firebase.Error */err){
+                !err ? resolve() : reject(err);
+            });
+    });
+};
+
+
+/**
+ * Firebase.changePassword() wrapped in a promise.
+ *
+ * @param {!Firebase} ref
+ * @param {!{email:string, oldPassword:string, newPassword:string}} credentials
+ * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise which resolves when the
+ *      operation is complete, or is rejected with an error.
+ */
+onfire.utils.firebase.changePassword = function(ref, credentials) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        ref.changePassword(credentials,
+            function(/** Firebase.Error */err){
+                !err ? resolve() : reject(err);
+            });
+    });
+};
+
+
+/**
+ * Firebase.removeUser() wrapped in a promise.
+ *
+ * @param {!Firebase} ref
+ * @param {!Firebase.AuthPasswordCredentials} credentials
+ * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise which resolves when the
+ *      operation is complete, or is rejected with an error.
+ */
+onfire.utils.firebase.removeUser = function(ref, credentials) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        ref.removeUser(credentials,
+            function(/** Firebase.Error */err){
+                !err ? resolve() : reject(err);
+            });
+    });
+};
+
+
+/**
+ * Firebase.resetPassword() wrapped in a promise.
+ *
+ * @param {!Firebase} ref
+ * @param {!{email:string}} credentials
+ * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise which resolves when the
+ *      operation is complete, or is rejected with an error.
+ */
+onfire.utils.firebase.resetPassword = function(ref, credentials) {
+    return onfire.utils.promise.newPromise(function(resolve, reject) {
+        ref.resetPassword(credentials,
+            function(/** Firebase.Error */err){
+                !err ? resolve() : reject(err);
+            });
+    });
+};
 
 
 /**

@@ -146,6 +146,51 @@ onfire.Ref.prototype.authWithOAuthToken = function(provider, credentials, opt_op
 
 
 /**
+ * Firebase.changeEmail() wrapped in a promise.
+ * @see https://www.firebase.com/docs/web/api/firebase/changeemail.html
+ *
+ * @param {!{oldEmail:string, password:string, newEmail:string}} credentials
+ * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise which resolves when the
+ *      operation is complete, or is rejected with an error.
+ * @export
+ */
+onfire.Ref.prototype.changeEmail = function(credentials) {
+
+    return onfire.utils.firebase.changeEmail(this.ref_, credentials);
+};
+
+
+/**
+ * Firebase.changePassword() wrapped in a promise.
+ * @see https://www.firebase.com/docs/web/api/firebase/changepassword.html
+ *
+ * @param {!{email:string, oldPassword:string, newPassword:string}} credentials
+ * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise which resolves when the
+ *      operation is complete, or is rejected with an error.
+ * @export
+ */
+onfire.Ref.prototype.changePassword = function(credentials) {
+
+    return onfire.utils.firebase.changePassword(this.ref_, credentials);
+};
+
+
+/**
+ * Firebase.createUser() wrapped in a promise.
+ * @see https://www.firebase.com/docs/web/api/firebase/createuser.html
+ *
+ * @param {!Firebase.AuthPasswordCredentials} credentials
+ * @return {!Promise<!{uid:string},!Error>|!goog.Promise<!{uid:string},!Error>} A promise which
+ *      resolves to a userData object, or is rejected with an error.
+ * @export
+ */
+onfire.Ref.prototype.createUser = function(credentials) {
+
+    return onfire.utils.firebase.createUser(this.ref_, credentials);
+};
+
+
+/**
  * A proxy for Firebase.getAuth().
  * @see https://www.firebase.com/docs/web/api/firebase/getauth.html
  *
@@ -155,6 +200,30 @@ onfire.Ref.prototype.authWithOAuthToken = function(provider, credentials, opt_op
 onfire.Ref.prototype.getAuth = function() {
 
     return this.ref_.getAuth();
+};
+
+
+/**
+ * A proxy for Firebase.goOnline().
+ * @see https://www.firebase.com/docs/web/api/firebase/goonline.html
+ *
+ * @export
+ */
+onfire.Ref.prototype.goOnline = function() {
+
+    this.ref_.goOnline();
+};
+
+
+/**
+ * A proxy for Firebase.goOffline().
+ * @see https://www.firebase.com/docs/web/api/firebase/gooffline.html
+ *
+ * @export
+ */
+onfire.Ref.prototype.goOffline = function() {
+
+    this.ref_.goOffline();
 };
 
 
@@ -465,6 +534,36 @@ onfire.Ref.prototype.remove = function() {
             onfire.utils.logging.error('REMOVE (Failure) ' + self.path(), err);
             throw err;
         });
+};
+
+
+/**
+ * Firebase.removeUser() wrapped in a promise.
+ * @see https://www.firebase.com/docs/web/api/firebase/removeuser.html
+ *
+ * @param {!Firebase.AuthPasswordCredentials} credentials
+ * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise which resolves when the
+ *      operation is complete, or is rejected with an error.
+ * @export
+ */
+onfire.Ref.prototype.removeUser = function(credentials) {
+
+    return onfire.utils.firebase.removeUser(this.ref_, credentials);
+};
+
+
+/**
+ * Firebase.resetPassword() wrapped in a promise.
+ * @see https://www.firebase.com/docs/web/api/firebase/resetpassword.html
+ *
+ * @param {!{email:string}} credentials
+ * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise which resolves when the
+ *      operation is complete, or is rejected with an error.
+ * @export
+ */
+onfire.Ref.prototype.resetPassword = function(credentials) {
+
+    return onfire.utils.firebase.resetPassword(this.ref_, credentials);
 };
 
 

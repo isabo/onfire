@@ -187,8 +187,8 @@ onfire.Ref.prototype.authWithPassword = function(credentials, opt_options) {};
  * @see https://www.firebase.com/docs/web/api/firebase/changeemail.html
  *
  * @param {!{oldEmail:string, password:string, newEmail:string}} credentials
- * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise which resolves when the
- *      operation is complete, or is rejected with an error.
+ * @return {!Promise<null,!Error>} A promise which resolves when the operation is complete, or is
+ *      rejected with an error.
  */
 onfire.Ref.prototype.changeEmail = function(credentials) {};
 
@@ -198,8 +198,8 @@ onfire.Ref.prototype.changeEmail = function(credentials) {};
  * @see https://www.firebase.com/docs/web/api/firebase/changepassword.html
  *
  * @param {!{email:string, oldPassword:string, newPassword:string}} credentials
- * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise which resolves when the
- *      operation is complete, or is rejected with an error.
+ * @return {!Promise<null,!Error>} A promise which resolves when the operation is complete, or is
+ *      rejected with an error.
  */
 onfire.Ref.prototype.changePassword = function(credentials) {};
 
@@ -209,8 +209,8 @@ onfire.Ref.prototype.changePassword = function(credentials) {};
  * @see https://www.firebase.com/docs/web/api/firebase/createuser.html
  *
  * @param {!Firebase.AuthPasswordCredentials} credentials
- * @return {!Promise<!{uid:string}},!Error>|!goog.Promise<!{uid:string},!Error>} A promise which
- *      resolves to a userData object, or is rejected with an error.
+ * @return {!Promise<!{uid:string}},!Error>} A promise which resolves to a userData object, or is
+ *      rejected with an error.
  */
 onfire.Ref.prototype.createUser = function(credentials) {};
 
@@ -397,8 +397,8 @@ onfire.Ref.prototype.remove = function() {};
  * @see https://www.firebase.com/docs/web/api/firebase/removeuser.html
  *
  * @param {!Firebase.AuthPasswordCredentials} credentials
- * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise which resolves when the
- *      operation is complete, or is rejected with an error.
+ * @return {!Promise<null,!Error>} A promise which resolves when the operation is complete, or is
+ *      rejected with an error.
  */
 onfire.Ref.prototype.removeUser = function(credentials) {};
 
@@ -408,8 +408,8 @@ onfire.Ref.prototype.removeUser = function(credentials) {};
  * @see https://www.firebase.com/docs/web/api/firebase/resetpassword.html
  *
  * @param {!{email:string}} credentials
- * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise which resolves when the
- *      operation is complete, or is rejected with an error.
+ * @return {!Promise<null,!Error>} A promise which resolves when the operation is complete, or is
+ *      rejected with an error.
  */
 onfire.Ref.prototype.resetPassword = function(credentials) {};
 

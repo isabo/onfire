@@ -1,6 +1,6 @@
 # OnFire
-OnFire is a general purpose library that makes it easier to develop and maintain Firebase apps,
-whether they are browser-based or run on Node.js, which have complex data structures.
+OnFire is a general purpose library that makes it easier to develop and maintain Firebase apps that
+have complex data structures, whether they are browser-based or run on Node.js.
 
 Already implemented:
 * Schema-driven, live **models**. Where appropriate, property values are also models, automatically.

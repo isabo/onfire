@@ -7,7 +7,6 @@ java -server -jar ../node_modules/google-closure-compiler/compiler.jar \
 --compilation_level ADVANCED \
 --warning_level VERBOSE \
 --summary_detail_level 3 \
---formatting PRETTY_PRINT \
 --jscomp_warning missingRequire \
 --jscomp_warning useOfGoogBase \
 --generate_exports \

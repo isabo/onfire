@@ -114,6 +114,34 @@ test('Simple model', function (t) {
     ref.flush();
 });
 
+test('Callback', function(t) {
+
+    t.plan(2);
+
+    // Prepare the constructor.
+    var schema = {
+        number: 'number',
+        string: 'string',
+        boolean: 'boolean'
+    };
+    var Thing = onfire.defineModel(schema);
+
+    var ref = rootRef.child('model');
+    var thingRef = new onfire.Ref(ref);
+    var thing = new Thing(thingRef);
+    thing.onValueChanged(function(th) {
+        t.pass('Calls callback when value is changed');
+        // t.equal(th.number(), 1, 'Updated value is available in change event');
+    });
+    thing.whenLoaded().then(function() {
+        var p = thing.number(2).save();
+        // ref.child('number').set(2);
+        ref.flush();
+        return p;
+    });
+    ref.flush();
+});
+
 test('Read Permission Denied', function(t) {
 
     // Prepare the constructor.

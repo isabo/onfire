@@ -162,3 +162,4 @@ test('onfire.Ref.transaction()', function (t) {
 });
 
 // TODO: on, off.
+// TODO: authentication methods

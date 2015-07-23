@@ -454,6 +454,15 @@ onfire.model.Model.prototype.exists = function() {};
 
 
 /**
+ * Register the callback function that will be called whenever the model is updated. To deregister
+ * an existing callback, just pass null as the callback argument.
+ *
+ * @param {function(onfire.model.Model)} callback
+ */
+onfire.model.Model.prototype.onValueChanged = function(callback) {};
+
+
+/**
  * Synchronously retrieves the value associated with a key. If the value is not a primitive, a model
  * instance will be returned, in which case .whenLoaded() should be called on the returned model in
  * order to know when it is ready to use. If the key is already known to represent a model, it is

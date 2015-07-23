@@ -569,6 +569,15 @@ onfire.model.Model.prototype.key = function() {};
 
 
 /**
+ * Register the callback function that will be called whenever the model is updated. To deregister
+ * an existing callback, just pass null as the callback argument.
+ *
+ * @param {function(onfire.model.Model)} callback
+ */
+onfire.model.Model.prototype.onValueChanged = function(callback) {};
+
+
+/**
  * Asynchronously commits the outstanding changes.
  *
  * @return {!Promise<!onfire.model.Model,!Error>} A promise that resolves to this model instance

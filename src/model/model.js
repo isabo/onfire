@@ -29,6 +29,22 @@ onfire.model.Model = function(ref) {
     this.ref = ref;
 
     /**
+     * Whether the model has fully loaded and got its data from the database yet.
+     *
+     * @type {boolean}
+     * @protected
+     */
+    this.isLoaded;
+
+    /**
+     * Callback function for notifying consumer when a change has occurred.
+     *
+     * @type {function(!onfire.model.Model)|null}
+     * @protected
+     */
+    this.valueCallback;
+
+    /**
      * The current state in the database.
      *
      * @type {Object}
@@ -103,10 +119,10 @@ onfire.model.Model = function(ref) {
 onfire.model.Model.prototype.dispose = function() {
 
     onfire.utils.logging.info('DISPOSE  ' + this.ref.path() + ' ...');
-    var id = this.key();
 
     delete this.loadPromise_;// = null;
     this.stopMonitoring_();
+    this.valueCallback = null;
 
     // Dispose subordinate models that were created by constructor.
     for (var i = 0; i < this.toDispose_.length; i++) {
@@ -172,8 +188,12 @@ onfire.model.Model.prototype.configureInstance = function(schema) {
             return onfire.utils.promise.all(promises);
         }).
         then(function() {
+            self.isLoaded = true;
             return self;
         });
+
+    // Since we just extended the loadPromise, we are not considered loaded.
+    self.isLoaded = false;
 };
 
 
@@ -189,23 +209,24 @@ onfire.model.Model.prototype.startMonitoring = function() {
     var self = this;
     return onfire.utils.promise.newPromise(function(resolve, reject) {
 
-        var isLoaded = false;
+        self.isLoaded = false;
 
         // Monitor VALUE events.
         var fn = self.ref.onValue(function(/** !Object */newValue) {
 
+            var wasAlreadyLoaded = self.isLoaded;
+
             self.handleValue(newValue);
 
             // Resolve/reject promise upon first response.
-            if (!isLoaded) {
-                isLoaded = true;
+            if (!wasAlreadyLoaded) {
                 resolve(self);
             }
 
         }, function(/** !Error */err) {
 
             // Monitoring is cancelled.
-            if (!isLoaded) {
+            if (!self.isLoaded) {
                 reject(err);
             }
         });
@@ -264,7 +285,24 @@ onfire.model.Model.prototype.key = function() {
  */
 onfire.model.Model.prototype.exists = function() {
 
+    if (!this.isLoaded) {
+        throw new Error('Not loaded yet');
+    }
+
     return !!this.storageObj;
+};
+
+
+/**
+ * Register the callback function that will be called whenever the model is updated. To deregister
+ * an existing callback, just pass null as the callback argument.
+ *
+ * @param {function(!onfire.model.Model)|null} callback
+ * @export
+ */
+onfire.model.Model.prototype.onValueChanged = function(callback) {
+
+    this.valueCallback = callback;
 };
 
 
@@ -278,6 +316,12 @@ onfire.model.Model.prototype.handleValue = function(newValue) {
 
     this.storageObj = newValue;
     this.childrenCount = goog.object.getKeys(newValue).length;
+
+    this.isLoaded = true; // Now the callback can call methods without triggering exceptions.
+
+    if (this.valueCallback) {
+        this.valueCallback.call(null, this);
+    }
 };
 
 
@@ -322,18 +366,19 @@ onfire.model.Model.prototype.get = function(key) {
  */
 onfire.model.Model.prototype.getBasicValue = function(key) {
 
-    if (this.storageObj) {
-        if (key in this.storageObj) {
-            return this.storageObj[key];
-        } else {
-            if (this.isKeySpecified_(key)) {
-                return null;
-            } else {
-                throw new Error('No such property: ' + key);
-            }
-        }
-    } else {
+    if (!this.isLoaded) {
         throw new Error('Not loaded yet');
+    }
+
+    if (this.storageObj && key in this.storageObj) {
+        return this.storageObj[key];
+    }
+
+    if (this.isKeySpecified_(key)) {
+        // Key is allowed, but has not been assigned a value.
+        return null;
+    } else {
+        throw new Error('No such property: ' + key);
     }
 };
 
@@ -379,7 +424,13 @@ onfire.model.Model.prototype.set = function(key, value) {
 
     // TODO: validate that value is a Firebase.Value.
     // TODO: validate that value matches the schema.
-    if (!(key in this.storageObj) && !this.isKeySpecified_(key)) {
+    if (!this.isLoaded) {
+        throw new Error('Not loaded yet');
+    }
+
+    var keyIsSpecified = this.isKeySpecified_(key);
+    var keyIsUsed = this.storageObj && key in this.storageObj;
+    if (!keyIsSpecified && !keyIsUsed) {
         throw new Error('No such property: ' + key);
     }
 
@@ -457,7 +508,9 @@ onfire.model.Model.prototype.update = function(pairs) {
     for (var p in pairs) {
         try {
             oldPairs[p] = this.getBasicValue(p);
-        } catch (e) {}
+        } catch (e) {
+            // Ignore 'No such property' errors. What they mean is 'No such property ... yet'
+        }
     }
 
     var self = this;

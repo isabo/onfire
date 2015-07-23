@@ -61,6 +61,8 @@ onfire.model.Collection.prototype.startMonitoring = function() {
 
         self.monitoringParams.push([onfire.utils.firebase.EventType.CHILD_ADDED, f1, self]);
         self.monitoringParams.push([onfire.utils.firebase.EventType.CHILD_REMOVED, f2, self]);
+
+        self.isLoaded = true;
     });
 
     return p;
@@ -105,15 +107,19 @@ onfire.model.Collection.prototype.get = function(key) {
  */
 onfire.model.Collection.prototype.getModel = function(key) {
 
-    if (this.memberCtor_) {
-        if (this.containsKey(key)) {
-            return new this.memberCtor_(this.ref.child(key));
-        } else {
-            throw new Error('No such key in this collection: ' + key);
-        }
-    } else {
+    if (!this.memberCtor_) {
         throw new Error('Cannot create a model for a primitive value');
     }
+
+    if (!this.isLoaded) {
+        throw new Error('Not loaded yet');
+    }
+
+    if (!this.containsKey(key)) {
+        throw new Error('No such key in this collection: ' + key);
+    }
+
+    return new this.memberCtor_(this.ref.child(key));
 };
 
 
@@ -129,11 +135,15 @@ onfire.model.Collection.prototype.getModel = function(key) {
  */
 onfire.model.Collection.prototype.getBasicValue = function(key) {
 
-    if (this.containsKey(key)) {
-        return this.storageObj[key];
-    } else {
+    if (!this.isLoaded) {
+        throw new Error('Not loaded yet');
+    }
+
+    if (!this.containsKey(key)) {
         throw new Error('No such key in this collection: ' + key);
     }
+
+    return this.storageObj[key];
 };
 
 
@@ -363,7 +373,7 @@ onfire.model.Collection.prototype.count = function() {
  */
 onfire.model.Collection.prototype.containsKey = function(key) {
 
-    return key in this.storageObj;
+    return !!this.storageObj && key in this.storageObj;
 };
 
 

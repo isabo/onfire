@@ -1,6 +1,7 @@
 goog.provide('onfire.model.Model');
 
 goog.require('onfire.Ref');
+goog.require('onfire.model.Error');
 goog.require('onfire.model.schema');
 goog.require('onfire.utils.firebase.EventType');
 goog.require('onfire.utils.promise');
@@ -19,7 +20,7 @@ goog.require('goog.object');
 onfire.model.Model = function(ref) {
 
     if (!(ref instanceof onfire.Ref)) {
-        throw new Error('ref argument must be an onfire.Ref instance');
+        throw new Error(onfire.model.Error.INVALID_REF);
     }
 
     /**
@@ -286,7 +287,7 @@ onfire.model.Model.prototype.key = function() {
 onfire.model.Model.prototype.exists = function() {
 
     if (!this.isLoaded) {
-        throw new Error('Not loaded yet');
+        throw new Error(onfire.model.Error.NOT_LOADED);
     }
 
     return !!this.storageObj;
@@ -367,7 +368,7 @@ onfire.model.Model.prototype.get = function(key) {
 onfire.model.Model.prototype.getBasicValue = function(key) {
 
     if (!this.isLoaded) {
-        throw new Error('Not loaded yet');
+        throw new Error(onfire.model.Error.NOT_LOADED);
     }
 
     if (this.storageObj && key in this.storageObj) {
@@ -378,16 +379,16 @@ onfire.model.Model.prototype.getBasicValue = function(key) {
         // Key is allowed, but has not been assigned a value.
         return null;
     } else {
-        throw new Error('No such property: ' + key);
+        throw new Error(onfire.model.Error.NO_SUCH_KEY);
     }
 };
 
 
 /**
  * Synchronously retrieves the model instance that represents a non-primitive value that is
- * associated with a key. Make sure to call .whenLoaded() on the returned model in order to know when
- * it is ready to use. In many cases it may be more convenient to call the asynchronous .fetch()
- * method instead.
+ * associated with a key. Make sure to call .whenLoaded() on the returned model in order to know
+ * when it is ready to use. In many cases it may be more convenient to call the asynchronous
+ * .fetch() method instead.
  * If the key is not specified in the schema, an exception will be thrown.
  *
  * @param {string} key
@@ -397,12 +398,22 @@ onfire.model.Model.prototype.getBasicValue = function(key) {
  */
 onfire.model.Model.prototype.getModel = function(key) {
 
-    if (this.isKeySpecified_(key) && typeof this.schema[key] !== 'string') {
-        // Specified as a primitive value.
-        return this[key + onfire.model.Model.INSTANCE_SUFFIX];
-    } else {
-        throw new Error('No such property: ' + key);
+    if (!this.isLoaded) {
+        throw new Error(onfire.model.Error.NOT_LOADED);
     }
+
+    if (!this.isKeySpecified_(key)) {
+        throw new Error(onfire.model.Error.NO_SUCH_KEY);
+    }
+
+    if (typeof this.schema[key] === 'string') {
+        // The schema value for this key is a string like 'number', 'string', 'boolean' -- i.e.,
+        // not an object or predefined model constructor.
+        throw new Error(onfire.model.Error.NOT_A_MODEL);
+    }
+
+    //Value is an object according to the schema, and would already have been instantiated.
+    return this[key + onfire.model.Model.INSTANCE_SUFFIX];
 };
 
 
@@ -425,13 +436,18 @@ onfire.model.Model.prototype.set = function(key, value) {
     // TODO: validate that value is a Firebase.Value.
     // TODO: validate that value matches the schema.
     if (!this.isLoaded) {
-        throw new Error('Not loaded yet');
+        throw new Error(onfire.model.Error.NOT_LOADED);
     }
 
     var keyIsSpecified = this.isKeySpecified_(key);
     var keyIsUsed = this.storageObj && key in this.storageObj;
+
     if (!keyIsSpecified && !keyIsUsed) {
-        throw new Error('No such property: ' + key);
+        throw new Error(onfire.model.Error.NO_SUCH_KEY);
+    }
+
+    if (keyIsSpecified && typeof this.schema[key] !== 'string') {
+        throw new Error(onfire.model.Error.NOT_A_PRIMITIVE);
     }
 
     this.changes[key] = value;

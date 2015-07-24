@@ -4,6 +4,7 @@ goog.require('onfire.Ref');
 goog.require('onfire.model.factory');
 goog.require('onfire.model.Model');
 goog.require('onfire.model.Collection');
+goog.require('onfire.model.Error');
 goog.require('onfire.utils.detection');
 
 

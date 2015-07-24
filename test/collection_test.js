@@ -32,10 +32,10 @@ test('Collection of primitives', function(t) {
 
         // Test basic properties.
         t.equal(thingIds.key(), ref.key(), '.key() property works');
-        t.equal(thingIds.exists(), false, '.exists() is false before loading');
         t.equal(thingIds.hasChanges(), false, '.hasChanges() is false before loading');
-        t.equal(thingIds.count(), 0, '.count() is correct');
-        t.deepEqual(thingIds.keys(), [], '.keys() is correct');
+        t.throws(function(){thingIds.exists()}, Error, '.exists() throws an exception before loading');
+        t.throws(function(){thingIds.count()}, Error, '.count() throws an exception before loading');
+        t.throws(function(){thingIds.keys()}, Error, '.keys() throws an exception before loading');
 
         thingIds.whenLoaded().
             then(function() {
@@ -162,10 +162,10 @@ test('Collection of objects', function(t) {
 
         // Test basic properties.
         t.equal(things.key(), ref.key(), '.key() property works');
-        t.equal(things.exists(), false, '.exists() is false before loading');
         t.equal(things.hasChanges(), false, '.hasChanges() is false before loading');
-        t.equal(things.count(), 0, '.count() is correct');
-        t.deepEqual(things.keys(), [], '.keys() is correct');
+        t.throws(function(){thingIds.exists()}, Error, '.exists() throws an exception before loading');
+        t.throws(function(){thingIds.count()}, Error, '.count() throws an exception before loading');
+        t.throws(function(){thingIds.keys()}, Error, '.keys() throws an exception before loading');
 
         things.whenLoaded().
             then(function() {

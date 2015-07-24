@@ -1,6 +1,7 @@
 goog.provide('onfire.model.Collection');
 
 goog.require('onfire.model.Model');
+goog.require('onfire.model.Error');
 goog.require('onfire.triggers');
 goog.require('onfire.utils.firebase.EventType');
 goog.require('onfire.utils.promise');
@@ -61,8 +62,6 @@ onfire.model.Collection.prototype.startMonitoring = function() {
 
         self.monitoringParams.push([onfire.utils.firebase.EventType.CHILD_ADDED, f1, self]);
         self.monitoringParams.push([onfire.utils.firebase.EventType.CHILD_REMOVED, f2, self]);
-
-        self.isLoaded = true;
     });
 
     return p;
@@ -107,16 +106,16 @@ onfire.model.Collection.prototype.get = function(key) {
  */
 onfire.model.Collection.prototype.getModel = function(key) {
 
-    if (!this.memberCtor_) {
-        throw new Error('Cannot create a model for a primitive value');
+    if (!this.isLoaded) {
+        throw new Error(onfire.model.Error.NOT_LOADED);
     }
 
-    if (!this.isLoaded) {
-        throw new Error('Not loaded yet');
+    if (!this.memberCtor_) {
+        throw new Error(onfire.model.Error.NOT_A_MODEL);
     }
 
     if (!this.containsKey(key)) {
-        throw new Error('No such key in this collection: ' + key);
+        throw new Error(onfire.model.Error.NO_SUCH_KEY);
     }
 
     return new this.memberCtor_(this.ref.child(key));
@@ -136,11 +135,11 @@ onfire.model.Collection.prototype.getModel = function(key) {
 onfire.model.Collection.prototype.getBasicValue = function(key) {
 
     if (!this.isLoaded) {
-        throw new Error('Not loaded yet');
+        throw new Error(onfire.model.Error.NOT_LOADED);
     }
 
     if (!this.containsKey(key)) {
-        throw new Error('No such key in this collection: ' + key);
+        throw new Error(onfire.model.Error.NO_SUCH_KEY);
     }
 
     return this.storageObj[key];
@@ -166,9 +165,12 @@ onfire.model.Collection.prototype.set = function(key, value) {
     // TODO: validate that value is a Firebase.Value.
     // TODO: validate that value matches the schema.
 
+    if (!this.isLoaded) {
+        throw new Error(onfire.model.Error.NOT_LOADED);
+    }
+
     if (this.memberCtor_) {
-        throw new Error('.set() is for primitive values, not models.' +
-            ' Use .create() or .fetchOrCreate() instead.');
+        throw new Error(onfire.model.Error.NOT_A_PRIMITIVE);
     }
 
     this.changes[key] = value;
@@ -223,9 +225,12 @@ onfire.model.Collection.prototype.fetch = function(key) {
  */
 onfire.model.Collection.prototype.create = function(opt_values) {
 
+    if (!this.isLoaded) {
+        throw new Error(onfire.model.Error.NOT_LOADED);
+    }
+
     if (!this.memberCtor_) {
-        throw new Error('.create() is for creating models, not primitive values.' +
-            ' Use .set() instead.');
+        throw new Error(onfire.model.Error.NOT_A_MODEL);
     }
 
     var key = this.ref.generateId();
@@ -242,8 +247,8 @@ onfire.model.Collection.prototype.create = function(opt_values) {
 
 
 /**
- * Asynchronously retrieves an existing item by its key, or creates it if it does not yet exist, and
- * adds it to the collection.
+ * Asynchronously retrieves an existing model by its key, or creates it if it does not yet exist,
+ * and adds it to the collection.
  *
  * @param {string} key
  * @param {!Object<string,Firebase.Value>=} values A set of property/value pairs to assign if
@@ -255,8 +260,12 @@ onfire.model.Collection.prototype.create = function(opt_values) {
  */
 onfire.model.Collection.prototype.fetchOrCreate = function(key, values) {
 
+    if (!this.isLoaded) {
+        throw new Error(onfire.model.Error.NOT_LOADED);
+    }
+
     if (!this.memberCtor_) {
-        throw new Error('.fetchOrCreate() is for fetching/creating models, not primitive values');
+        throw new Error(onfire.model.Error.NOT_A_MODEL);
     }
 
     var item = new this.memberCtor_(this.ref.child(key));
@@ -287,6 +296,10 @@ onfire.model.Collection.prototype.fetchOrCreate = function(key, values) {
  * @export
  */
 onfire.model.Collection.prototype.remove = function(key) {
+
+    if (!this.isLoaded) {
+        throw new Error(onfire.model.Error.NOT_LOADED);
+    }
 
     if (!this.containsKey(key)) {
         return onfire.utils.promise.resolve(null);
@@ -337,6 +350,10 @@ onfire.model.Collection.prototype.remove = function(key) {
  */
 onfire.model.Collection.prototype.forEach = function(callback) {
 
+    if (!this.isLoaded) {
+        throw new Error(onfire.model.Error.NOT_LOADED);
+    }
+
     var promises = [];
     for (var key in this.storageObj) {
 
@@ -360,6 +377,10 @@ onfire.model.Collection.prototype.forEach = function(callback) {
  */
 onfire.model.Collection.prototype.count = function() {
 
+    if (!this.isLoaded) {
+        throw new Error(onfire.model.Error.NOT_LOADED);
+    }
+
     return this.childrenCount;
 };
 
@@ -373,6 +394,10 @@ onfire.model.Collection.prototype.count = function() {
  */
 onfire.model.Collection.prototype.containsKey = function(key) {
 
+    if (!this.isLoaded) {
+        throw new Error(onfire.model.Error.NOT_LOADED);
+    }
+
     return !!this.storageObj && key in this.storageObj;
 };
 
@@ -384,6 +409,10 @@ onfire.model.Collection.prototype.containsKey = function(key) {
  * @export
  */
 onfire.model.Collection.prototype.keys = function() {
+
+    if (!this.isLoaded) {
+        throw new Error(onfire.model.Error.NOT_LOADED);
+    }
 
     return goog.object.getKeys(this.storageObj);
 };

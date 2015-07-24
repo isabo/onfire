@@ -283,6 +283,7 @@ onfire.model.Model.prototype.key = function() {
  *
  * @return {boolean} Whether the underlying data actually exists.
  * @export
+ * @throws {Error} if called when model is not yet loaded.
  */
 onfire.model.Model.prototype.exists = function() {
 
@@ -489,6 +490,7 @@ onfire.model.Model.prototype.hasChanges = function() {
  *      promise that resolves to this model instance when the operation completes successfully, or
  *      is rejected with an error.
  * @export
+ * @throws {Error} if called when model is not yet loaded.
  */
 onfire.model.Model.prototype.save = function() {
 

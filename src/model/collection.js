@@ -86,6 +86,7 @@ onfire.model.Collection.prototype.whenLoaded;
  * @param {string} key An key of an item in the collection.
  * @return {Firebase.Value|onfire.model.Model} A primitive value or a model instance.
  * @export
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.get = function(key) {
 
@@ -159,6 +160,7 @@ onfire.model.Collection.prototype.getBasicValue = function(key) {
  * @param {Firebase.Value} value The primitive value to assign to the property.
  * @return {!onfire.model.Collection}
  * @export
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.set = function(key, value) {
 
@@ -222,6 +224,7 @@ onfire.model.Collection.prototype.fetch = function(key) {
  * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
  *      promise that resolves to a model instance, or is rejected with an error.
  * @export
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.create = function(opt_values) {
 
@@ -257,6 +260,7 @@ onfire.model.Collection.prototype.create = function(opt_values) {
  * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
  *      promise that resolves to a model instance, or is rejected with an error.
  * @export
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.fetchOrCreate = function(key, values) {
 
@@ -294,6 +298,7 @@ onfire.model.Collection.prototype.fetchOrCreate = function(key, values) {
  * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise that resolves when the
  *      operation is complete, or is rejected with an error.
  * @export
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.remove = function(key) {
 
@@ -347,6 +352,7 @@ onfire.model.Collection.prototype.remove = function(key) {
     } callback
  * @return {(!Promise|!goog.Promise)} A promise that in resolved when all callbacks have completed.
  * @export
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.forEach = function(callback) {
 
@@ -374,6 +380,7 @@ onfire.model.Collection.prototype.forEach = function(callback) {
  *
  * @return {number} The number of values in the collection.
  * @export
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.count = function() {
 
@@ -391,6 +398,7 @@ onfire.model.Collection.prototype.count = function() {
  * @param {string} key
  * @return {boolean}
  * @export
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.containsKey = function(key) {
 
@@ -407,6 +415,7 @@ onfire.model.Collection.prototype.containsKey = function(key) {
  *
  * @return {!Array<string>} An array of the keys of members in the collection.
  * @export
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.keys = function() {
 

@@ -449,6 +449,7 @@ onfire.model.Model.prototype.dispose = function() {};
  * it may have subsequently been deleted.
  *
  * @return {boolean} Whether the underlying data actually exists.
+ * @throws {Error}
  */
 onfire.model.Model.prototype.exists = function() {};
 
@@ -530,6 +531,7 @@ onfire.model.Model.prototype.key = function() {};
  * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
  *      promise that resolves to this model instance when the operation completes successfully, or
  *      is rejected with an error.
+ * @throws {Error} if called when model is not yet loaded.
  */
 onfire.model.Model.prototype.save = function() {};
 
@@ -580,7 +582,7 @@ onfire.model.Collection = function(ref, opt_memberCtor) {};
  *
  * @param {string} key
  * @return {boolean}
- * @nosideeffects
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.containsKey = function(key) {};
 
@@ -589,7 +591,7 @@ onfire.model.Collection.prototype.containsKey = function(key) {};
  * Returns the number of values in the collection.
  *
  * @return {number} The number of values in the collection.
- * @nosideeffects
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.count = function() {};
 
@@ -602,6 +604,7 @@ onfire.model.Collection.prototype.count = function() {};
  *        to initialize the new object with.
  * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
  *      promise that resolves to a model instance, or is rejected with an error.
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.create = function(opt_values) {};
 
@@ -628,6 +631,7 @@ onfire.model.Collection.prototype.fetch = function(key) {};
  *      value is set and committed to the database.
  * @return {!Promise<!onfire.model.Model,!Error>|!goog.Promise<!onfire.model.Model,!Error>} A
  *      promise that resolves to a model instance, or is rejected with an error.
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.fetchOrCreate = function(key, values) {};
 
@@ -644,6 +648,7 @@ onfire.model.Collection.prototype.fetchOrCreate = function(key, values) {};
         !function((!onfire.model.Model|Firebase.Value), string=):(!Promise|!goog.Promise|undefined)
     } callback
  * @return {(!Promise|!goog.Promise)} A promise that in resolved when all callbacks have completed.
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.forEach = function(callback) {};
 
@@ -692,7 +697,7 @@ onfire.model.Collection.prototype.getModel = function(key) {};
  * Returns an array of the keys of members in the collection.
  *
  * @return {!Array<string>} An array of the keys of members in the collection.
- * @nosideeffects
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.keys = function() {};
 
@@ -704,6 +709,7 @@ onfire.model.Collection.prototype.keys = function() {};
  * @param {string} key The key of the member.
  * @return {!Promise<null,!Error>|!goog.Promise<null,!Error>} A promise that resolves when the
  *      operation is complete, or is rejected with an error.
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.remove = function(key) {};
 
@@ -720,6 +726,7 @@ onfire.model.Collection.prototype.remove = function(key) {};
  * @param {string} key The name of a property.
  * @param {Firebase.Value} value The primitive value to assign to the property.
  * @return {!onfire.model.Collection}
+ * @throws {Error}
  */
 onfire.model.Collection.prototype.set = function(key, value) {};
 
@@ -736,3 +743,55 @@ onfire.model.Collection.prototype.save;
  * @return {!Promise<!onfire.model.Collection,!Error>|!goog.Promise<!onfire.model.Collection,!Error>}
  */
 onfire.model.Collection.prototype.whenLoaded;
+
+
+
+
+/**
+ * Error messages that are thrown.
+ *
+ * @enum {string}
+ */
+onfire.model.Error = {};
+
+/**
+ * Thrown when the argument provided to the model constructor is not an onfire.Ref instance.
+ *
+ * @type {string}
+ */
+onfire.model.Error.INVALID_REF;
+
+/**
+ * Thrown when a property or method is accessed before the model has finished loading, and the
+ * result would be incorrect or unavailable.
+ *
+ * @type {string}
+ */
+onfire.model.Error.NOT_LOADED;
+
+/**
+ * Thrown when an attempt is made to get or set the value of a key that is not specified in the
+ * schema and does not exist in the underlying data.
+ *
+ * @type {string}
+ */
+onfire.model.Error.NO_SUCH_KEY;
+
+/**
+ * Thrown when an attempt is made to obtain a model to represent a primitive value, e.g. calling
+ * .getModel('abc') when .abc has an integer value according to the schema or in reality.
+ * Another example is calling a collection's .create(), .fetch() or fetchOrCreate() methods
+ * when the collection is a colection of primitive values and not models.
+ *
+ * @type {string}
+ */
+onfire.model.Error.NOT_A_MODEL;
+
+/**
+ * Thrown when an attempt is made to assign a value to a key that represents a model. Any
+ * changes need to be assigned via the model itself. In order to add a model instance to a
+ * collection use .create() or .fetchOrCreate() instead of .set().
+ *
+ * @type {string}
+ */
+onfire.model.Error.NOT_A_PRIMITIVE;

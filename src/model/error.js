@@ -10,7 +10,7 @@ goog.provide('onfire.model.Error');
 onfire.model.Error = {
 
     /**
-     * Thrown when the argument provided to the constructor is not an onfire.Ref instance.
+     * Thrown when the argument provided to the model constructor is not an onfire.Ref instance.
      */
     'INVALID_REF': 'Invalid ref argument - it must be an onfire.Ref instance',
 

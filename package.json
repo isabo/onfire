@@ -1,6 +1,6 @@
 {
   "name": "onfire",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Models & Promises for Firebase",
   "main": "dist/onfire.min.js",
   "scripts": {
@@ -21,10 +21,12 @@
     "url": "https://github.com/isabo/onfire/issues"
   },
   "homepage": "https://github.com/isabo/onfire",
+  "peerDependencies": {
+    "firebase": "^2.2.7"
+  },
   "devDependencies": {
     "browserify": "^10.2.4",
     "faucet": "0.0.1",
-    "firebase": "^2.2.7",
     "firebase-externs": "0.0.0",
     "google-closure-compiler": "^20150609.0.0",
     "google-closure-library": "^20150609.0.0",

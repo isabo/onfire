@@ -31,6 +31,22 @@ onfire.model.Collection = function(ref, opt_memberCtor) {
      * @private
      */
     this.memberCtor_ = opt_memberCtor;
+
+    /**
+     * Callback function for notifying consumer when a child has been added.
+     *
+     * @type {function(string)|null}
+     * @protected
+     */
+    this.childAddedCallback;
+
+    /**
+     * Callback function for notifying consumer when a child has been removed.
+     *
+     * @type {function(string)|null}
+     * @protected
+     */
+    this.childRemovedCallback;
 };
 goog.inherits(onfire.model.Collection, onfire.model.Model);
 
@@ -65,6 +81,20 @@ onfire.model.Collection.prototype.startMonitoring = function() {
     });
 
     return p;
+};
+
+
+/**
+ * Releases resources used by the collection. Call this when you no longer need the instance.
+ *
+ * @export
+ */
+onfire.model.Collection.prototype.dispose = function() {
+
+    onfire.model.Collection.base(this, 'dispose');
+
+    this.childAddedCallback = null;
+    this.childRemovedCallback = null;
 };
 
 
@@ -149,7 +179,7 @@ onfire.model.Collection.prototype.getBasicValue = function(key) {
 
 /**
  * Registers the desire to change the primitive value associated with a key. The value will be
- * committed only when .save() is called. Returns a a reference to the current model to allow
+ * committed only when .save() is called. Returns a reference to the current model to allow
  * chaining, e.g.,
  *      person.set('firstName', 'John').set('lastName', 'Smith').save()
  * Throws an error if the key is not specified in the schema and does not already have a value in
@@ -428,6 +458,34 @@ onfire.model.Collection.prototype.keys = function() {
 
 
 /**
+ * Register the callback function that will be called whenever a child is added. To deregister
+ * an existing callback, just pass null as the callback argument.
+ *
+ * @param {function(string)|null} callback A function that will be called with the key of the new
+ *      child.
+ * @export
+ */
+onfire.model.Collection.prototype.onChildAdded = function(callback) {
+
+    this.childAddedCallback = callback;
+};
+
+
+/**
+ * Register the callback function that will be called whenever a child is removed. To deregister
+ * an existing callback, just pass null as the callback argument.
+ *
+ * @param {function(string)|null} callback A function that will be called with the key of the
+ *      removed child.
+ * @export
+ */
+onfire.model.Collection.prototype.onChildRemoved = function(callback) {
+
+    this.childRemovedCallback = callback;
+};
+
+
+/**
  * Add a property/value pair.
  *
  * @param {!Firebase.DataSnapshot} snapshot
@@ -444,7 +502,11 @@ onfire.model.Collection.prototype.handleChildAdded_ = function(snapshot) {
     this.storageObj[key] = snapshot.val();
     if (incrementNeeded) {
         this.childrenCount++;
+        if (this.childAddedCallback) {
+            this.childAddedCallback.call(null, snapshot.key());
+        }
     }
+
 };
 
 
@@ -462,6 +524,9 @@ onfire.model.Collection.prototype.handleChildRemoved_ = function(snapshot) {
         this.childrenCount--;
         if (this.childrenCount === 0) {
             this.storageObj = null;
+        }
+        if (this.childRemovedCallback) {
+            this.childRemovedCallback.call(null, snapshot.key());
         }
     }
 };

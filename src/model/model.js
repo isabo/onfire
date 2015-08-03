@@ -40,7 +40,7 @@ onfire.model.Model = function(ref) {
     /**
      * Callback function for notifying consumer when a change has occurred.
      *
-     * @type {function(!onfire.model.Model)|null}
+     * @type {function()|null}
      * @protected
      */
     this.valueCallback;
@@ -299,7 +299,7 @@ onfire.model.Model.prototype.exists = function() {
  * Register the callback function that will be called whenever the model is updated. To deregister
  * an existing callback, just pass null as the callback argument.
  *
- * @param {function(!onfire.model.Model)|null} callback
+ * @param {function()|null} callback
  * @export
  */
 onfire.model.Model.prototype.onValueChanged = function(callback) {
@@ -322,7 +322,7 @@ onfire.model.Model.prototype.handleValue = function(newValue) {
     this.isLoaded = true; // Now the callback can call methods without triggering exceptions.
 
     if (this.valueCallback) {
-        this.valueCallback.call(null, this);
+        this.valueCallback.call(null);
     }
 };
 
@@ -420,7 +420,7 @@ onfire.model.Model.prototype.getModel = function(key) {
 
 /**
  * Registers the desire to change the primitive value associated with a key. The value will be
- * committed only when .save() is called. Returns a a reference to the current model to allow
+ * committed only when .save() is called. Returns a reference to the current model to allow
  * chaining, e.g.,
  *      person.set('firstName', 'John').set('lastName', 'Smith').save()
  * Throws an error if the key is not specified in the schema and does not already have a value in

@@ -574,7 +574,7 @@ onfire.model.Model.prototype.key = function() {};
  * Register the callback function that will be called whenever the model is updated. To deregister
  * an existing callback, just pass null as the callback argument.
  *
- * @param {function(onfire.model.Model)} callback
+ * @param {function()|null} callback
  */
 onfire.model.Model.prototype.onValueChanged = function(callback) {};
 
@@ -591,7 +591,7 @@ onfire.model.Model.prototype.save = function() {};
 
 /**
  * Registers the desire to change the primitive value associated with a key. The value will be
- * committed only when .save() is called. Returns a a reference to the current model to allow
+ * committed only when .save() is called. Returns a reference to the current model to allow
  * chaining, e.g.,
  *      person.set('firstName', 'John').set('lastName', 'Smith').save()
  * Throws an error if the key is not specified in the schema and does not already have a value in
@@ -755,6 +755,26 @@ onfire.model.Collection.prototype.keys = function() {};
 
 
 /**
+ * Register the callback function that will be called whenever a child is added. To deregister
+ * an existing callback, just pass null as the callback argument.
+ *
+ * @param {function(string)|null} callback A function that will be called with the key of the new
+ *      child.
+ */
+onfire.model.Collection.prototype.onChildAdded = function(callback) {};
+
+
+/**
+ * Register the callback function that will be called whenever a child is removed. To deregister
+ * an existing callback, just pass null as the callback argument.
+ *
+ * @param {function(string)|null} callback A function that will be called with the key of the
+ *      removed child.
+ */
+onfire.model.Collection.prototype.onChildRemoved = function(callback) {};
+
+
+/**
  * Asynchronously removes the specified member of the collection. The promise is not rejected if the
  * member is not present.
  *
@@ -768,7 +788,7 @@ onfire.model.Collection.prototype.remove = function(key) {};
 
 /**
  * Registers the desire to change the primitive value associated with a key. The value will be
- * committed only when .save() is called. Returns a a reference to the current model to allow
+ * committed only when .save() is called. Returns a reference to the current model to allow
  * chaining, e.g.,
  *      person.set('firstName', 'John').set('lastName', 'Smith').save()
  * Throws an error if the key is not specified in the schema and does not already have a value in

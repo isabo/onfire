@@ -326,6 +326,58 @@ test('Collection of objects', function(t) {
     ref.flush();
 });
 
+test('Callbacks', function(t) {
+
+    // Prepare the constructor.
+    var schema = {
+        '$id': {
+            name: 'string'
+        }
+    };
+    var Things = onfire.defineModel(schema);
+
+    // Prepare the database.
+    var ref = rootRef.child('callbacks');
+    var thingsRef = new onfire.Ref(ref);
+    var things = new Things(thingsRef); // Initially empty.
+    var pushedKey;
+
+    // Set up the callbacks.
+    var valueCallbackCount = 0;
+    things.onValueChanged(function(th) {
+        if (valueCallbackCount > 0) {
+            t.fail('valueCallback called more than once');
+        } else {
+            t.pass('Calls callback when initialising collection');
+        }
+        valueCallbackCount++;
+    });
+    things.onChildAdded(function(key) {
+        t.pass('Calls childAdded callback when a child is added');
+        t.equal(key, pushedKey, 'ChildAdded callback is called with correct key');
+    });
+    things.onChildRemoved(function(key) {
+        t.pass('Calls childRemoved callback when a child is removed');
+        t.equal(key, pushedKey, 'ChildRemoved callback is called with correct key');
+        t.end();
+    });
+
+    // Add and remove items.
+    things.whenLoaded().then(function() {
+
+        // Add.
+        pushedKey = ref.push({name: 'ABC'}, function(){
+
+            // Remove.
+            ref.child(pushedKey).remove();
+            ref.flush();
+
+        }).key();
+        ref.flush();
+    });
+    ref.flush();
+});
+
 test('Read Permission Denied', function(t) {
 
     var schema = {

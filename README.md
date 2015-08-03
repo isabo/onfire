@@ -1,6 +1,6 @@
 # OnFire
-OnFire is a general purpose library that makes it easier to develop and maintain Firebase apps that
-have complex data structures, whether they are browser-based or run on Node.js.
+OnFire is a library that makes it easier to develop and maintain Firebase apps that have complex
+data structures, whether they are browser-based or run on Node.js.
 
 Already implemented:
 * Schema-driven, live **models**. Where appropriate, property values are also models, automatically.
@@ -36,21 +36,31 @@ var Person = onfire.defineModel(
         }
     });
 
+// Access an object at a specific location:
 var person = new Person(ref);
 person.whenLoaded().
     then(function(person) {
         // Do something with the person.
     });
 
-// A getter/setter is generated for each property.
+// A getter/setter is generated for each property specified in the schema.
 console.log(person.firstName());
 
 // The jobs property is automatically instantiated as a collection model.
 console.log(person.jobs().count())
 
-// The setters are chainable.
+// Chainable setters:
 person.firstName('Fred').lastName('Bloggs');
+
+// After setting the values, we need to save the changes:
 person.save().then(...); // a promise.
+
+// or all together:
+person.
+    firstName('Fred').
+    lastName('Bloggs').
+    save().
+    then(...); 
 
 // This will throw an exception, because of the mis-spelt property name.
 // Schema-driven modules reduce the chances of unintentional errors in your code.

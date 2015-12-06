@@ -6,7 +6,6 @@ goog.require('onfire.model.schema');
 goog.require('onfire.utils.firebase.EventType');
 goog.require('onfire.utils.promise');
 goog.require('onfire.utils.logging');
-goog.require('onfire.triggers');
 goog.require('goog.object');
 
 
@@ -196,7 +195,6 @@ onfire.model.Model.prototype.configureInstance = function(schema) {
     // Since we just extended the loadPromise, we are not considered loaded.
     self.isLoaded = false;
 };
-
 
 
 /**
@@ -520,43 +518,18 @@ onfire.model.Model.prototype.save = function() {
 onfire.model.Model.prototype.update = function(pairs) {
 
     // TODO: validate.
-    // Remember the old values for comparison afterwards.
-    var oldCount = this.childrenCount;
-    var oldPairs = {};
-    for (var p in pairs) {
-        try {
-            oldPairs[p] = this.getBasicValue(p);
-        } catch (e) {
-            // Ignore 'No such property' errors. What they mean is 'No such property ... yet'
-        }
-    }
 
+    var oldCount = this.childrenCount;
     var self = this;
     return this.ref.update(pairs).
-        then(function() {
-            var promises = [];
-            for(p in pairs) {
-                if (oldPairs[p] !== pairs[p]) {
-                    var valueRef = self.ref.child(p);
-                    var pr = onfire.triggers.triggerValueChanged(valueRef, oldPairs[p],
-                                pairs[p]);
-                    promises.push(pr);
-                }
-            }
-            return onfire.utils.promise.all(promises);
-        }).
         then(function() {
             if (oldCount > 0 && self.childrenCount === 0) {
                 // This object just disappeared because we set its remaining properties to null.
                 onfire.utils.logging.info('REMOVED ' + self.ref.path());
-                return onfire.triggers.triggerChildRemoved(self.ref.parent(), self, self.key());
             } else if (oldCount === 0 && self.childrenCount > 0) {
                 // This object just came back into existence.
                 onfire.utils.logging.info('CREATED ' + self.ref.path());
-                return onfire.triggers.triggerChildAdded(self.ref.parent(), self);
             }
-        }).
-        then(function() {
             return self;
         });
 };
@@ -584,13 +557,8 @@ onfire.model.Model.prototype.initializeValues = function(values) {
     then(function(/** !Object */result) {
         if (result['isCommitted']) {
             onfire.utils.logging.info('CREATED ' + self.ref.path());
-            return onfire.triggers.triggerChildAdded(self.ref.parent(), self).
-                then(function() {
-                    return result;
-                });
-        } else {
-            return result;
         }
+        return result;
     });
 };
 

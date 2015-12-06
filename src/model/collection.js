@@ -2,7 +2,6 @@ goog.provide('onfire.model.Collection');
 
 goog.require('onfire.model.Model');
 goog.require('onfire.model.Error');
-goog.require('onfire.triggers');
 goog.require('onfire.utils.firebase.EventType');
 goog.require('onfire.utils.promise');
 goog.require('goog.object');
@@ -214,7 +213,7 @@ onfire.model.Collection.prototype.set = function(key, value) {
 
 /**
  * @override the return type.
- * @return {!onfire.model.Collection}
+ * @return {!Promise<!onfire.model.Collection,!Error>|!goog.Promise<!onfire.model.Collection,!Error>}
  */
 onfire.model.Collection.prototype.save;
 
@@ -223,7 +222,7 @@ onfire.model.Collection.prototype.save;
  * @override the return type.
  * @param {!Object<string,Firebase.Value>} pairs An object containing the property/value pairs to
  *        update.
- * @return {!onfire.model.Collection}
+ * @return {!Promise<!onfire.model.Collection,!Error>|!goog.Promise<!onfire.model.Collection,!Error>}
  * @protected
  */
 onfire.model.Collection.prototype.update;
@@ -340,31 +339,12 @@ onfire.model.Collection.prototype.remove = function(key) {
         return onfire.utils.promise.resolve(null);
     }
 
-    // We need an instance of the item being removed, so that we can provide it to the trigger
-    // function. Nope -- by the time that happens, its properties will be null?!! Add a .disconnect()
-    // method that will freeze the current snapshot?
-    var promise = this.memberCtor_ ?
-        this.fetch(key) : onfire.utils.promise.resolve(this.getBasicValue(key));
-
-    var removed;
-    var self = this;
-    return promise.
-        then(function(/** !onfire.model.Model|Firebase.Value */item) {
-            removed = item;
-        }).
-        then(function() {
-            // self.set(key, null); <-- will throw an exception if collection members are models.
-            self.changes[key] = null;
-            self.hasOustandingChanges = true;
-            return self.save();
-        }).
-        then(function() {
-            return onfire.triggers.triggerChildRemoved(self.ref, removed, key);
-        }).
-        then(function() {
-            if (removed instanceof onfire.model.Model) {
-                removed.dispose();
-            }
+    // self.set(key, null); <-- will throw an exception if collection members are models.
+    this.changes[key] = null;
+    this.hasOustandingChanges = true;
+    return this.save().
+        then(function(self) {
+            return null;
         });
 };
 

@@ -302,7 +302,7 @@ test('Collection of objects', function(t) {
                     }, function(err) {
                         t.error(err, '.remove() failed');
                     });
-                ref.flush();
+                // ref.flush();
                 setTimeout(function() {
                     ref.flush()
                 });

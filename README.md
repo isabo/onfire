@@ -7,9 +7,7 @@ Already implemented:
 * Makes **Promises**, instead of actually calling you back. :laughing:
 
 Coming soon:
-* Loose coupling between locally triggered "chain-reaction" operations, allowing more
-  compartmentalization and less spaghetti code. The most common use-case for this is for building
-  indexes that take care of themselves.
+* Atomic operations that involve multiple models simultaneously.
 * **Persistence!** This is for loading data while offline, or for priming your app for a quick start.
 
 Here are [more details](https://github.com/isabo/onfire/wiki/OnFire-Goals-&-Requirements).
@@ -60,7 +58,7 @@ person.
     firstName('Fred').
     lastName('Bloggs').
     save().
-    then(...); 
+    then(...);
 
 // This will throw an exception, because of the mis-spelt property name.
 // Schema-driven modules reduce the chances of unintentional errors in your code.

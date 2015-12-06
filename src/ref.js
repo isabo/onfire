@@ -320,7 +320,7 @@ onfire.Ref.prototype.key = function() {
  */
 onfire.Ref.prototype.off = function(opt_eventType, opt_callback, opt_context) {
 
-    this.ref_.off(opt_eventType, opt_callback, opt_context);
+    this.ref_.off(opt_eventType, opt_callback); // Because we wrap all callbacks, there is no context.
 };
 
 

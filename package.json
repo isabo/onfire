@@ -4,7 +4,7 @@
   "description": "Models & Promises for Firebase",
   "main": "dist/onfire.min.js",
   "scripts": {
-    "test": "./node_modules/tape/bin/tape test/**_test.js | ./node_modules/faucet/bin/cmd.js"
+    "test": "node_modules/.bin/tape test/**_test.js | node_modules/.bin/faucet",
     "build": "node build/build.js"
   },
   "repository": {

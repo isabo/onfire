@@ -882,4 +882,4 @@ This is not needed if you just want to use OnFire in your project.
 `npm test`
 
 ### How to Build the Distributables
-`./build/compile.sh`
+`npm run build`

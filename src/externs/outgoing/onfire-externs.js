@@ -752,7 +752,7 @@ onfire.model.Collection.prototype.set = function(key, value) {};
 
 /**
  * @override the return type.
- * @return {!onfire.model.Collection}
+ * @return {!Promise<!onfire.model.Collection,!Error>|!goog.Promise<!onfire.model.Collection,!Error>}
  */
 onfire.model.Collection.prototype.save;
 

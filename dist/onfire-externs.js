@@ -1,4 +1,11 @@
 /**
+ * OnFire
+ * Copyright (c) 2013 - 2015 Itzy Sabo
+ * Licensed under the MIT License: https://github.com/isabo/onfire/blob/master/LICENSE
+ */
+
+
+/**
  * An analogue of a Firebase reference.
  * @see https://www.firebase.com/docs/web/api/firebase/constructor.html
  *
@@ -752,7 +759,7 @@ onfire.model.Collection.prototype.set = function(key, value) {};
 
 /**
  * @override the return type.
- * @return {!onfire.model.Collection}
+ * @return {!Promise<!onfire.model.Collection,!Error>|!goog.Promise<!onfire.model.Collection,!Error>}
  */
 onfire.model.Collection.prototype.save;
 

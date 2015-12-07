@@ -16,7 +16,7 @@ var options = {
     closure_entry_point: 'onfire',
     only_closure_dependencies: true,
     generate_exports: true,
-    output_wrapper: '(function(){%output%})();//# sourceMappingURL=./onfire.min.js.map',
+    output_wrapper_file: 'build/wrapper.js',
     js_output_file: 'dist/onfire.min.js',
     create_source_map: '%outname%.map',
     source_map_location_mapping: [

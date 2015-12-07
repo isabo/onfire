@@ -1,4 +1,11 @@
 /**
+ * OnFire
+ * Copyright (c) 2013 - 2015 Itzy Sabo
+ * Licensed under the MIT License: https://github.com/isabo/onfire/blob/master/LICENSE
+ */
+
+
+/**
  * An analogue of a Firebase reference.
  * @see https://www.firebase.com/docs/web/api/firebase/constructor.html
  *

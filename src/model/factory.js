@@ -30,7 +30,8 @@ onfire.model.factory.defineModel = function(schemaOrCtor) {
     // It's an object. Does it represent a collection?
     if (onfire.model.schema.determineValueType(schemaOrCtor) ===
             onfire.model.schema.ValueType.COLLECTION) {
-        return onfire.model.factory.generateCollectionCtor_(schemaOrCtor);
+        return onfire.model.factory.generateCollectionCtor_(
+            /** @type {{$id:(string|!Object|!function(new:onfire.model.Model))}} */(schemaOrCtor));
     } else {
         return onfire.model.factory.generateModelCtor_(schemaOrCtor);
     }
@@ -187,7 +188,7 @@ onfire.model.factory.generateGetterSetter_ = function(propertyName) {
      */
     var getterSetter = function(opt_value) {
 
-        if (arguments.length === 0) {
+        if (opt_value === undefined) {
             return this.get(propertyName);
         } else {
             return this.set(propertyName, opt_value);

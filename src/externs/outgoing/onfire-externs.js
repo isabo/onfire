@@ -569,7 +569,8 @@ onfire.model.Model.prototype.whenLoaded = function() {};
 
 
 /**
- * Exposes the schema.
+ * Exposes the schema. This is only exposed on generated models, and is included here for
+ * documentation purposes only.
  *
  * @return {!Object}
  */

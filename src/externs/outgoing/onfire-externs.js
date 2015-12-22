@@ -568,6 +568,14 @@ onfire.model.Model.prototype.set = function(key, value) {};
 onfire.model.Model.prototype.whenLoaded = function() {};
 
 
+/**
+ * Exposes the schema.
+ *
+ * @return {!Object}
+ */
+onfire.model.Model.getSchema = function() {};
+
+
 
 
 /**

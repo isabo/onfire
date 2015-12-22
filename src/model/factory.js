@@ -1,5 +1,6 @@
 goog.provide('onfire.model.factory');
 
+goog.require('goog.object');
 goog.require('onfire.model.schema');
 goog.require('onfire.model.Model');
 goog.require('onfire.model.Collection');
@@ -57,6 +58,13 @@ onfire.model.factory.generateModelCtor_ = function(schema) {
     };
     goog.inherits(Model, onfire.model.Model);
 
+    // Expose the schema.
+    var schemaCopy = {};
+    goog.object.extend(schemaCopy, schema);
+    Model['getSchema'] = function() {
+        return schemaCopy;
+    };
+
     // Add prototype methods and generate subordinate constructors.
     onfire.model.factory.configureCtor_(Model, schema);
 
@@ -107,6 +115,13 @@ onfire.model.factory.generateCollectionCtor_ = function(schema) {
         Collection.base(this, 'constructor', ref, memberCtor);
     };
     goog.inherits(Collection, onfire.model.Collection);
+
+    // Expose the schema.
+    var schemaCopy = {};
+    goog.object.extend(schemaCopy, schema);
+    Collection['getSchema'] = function() {
+        return schemaCopy;
+    };
 
     return Collection;
 };

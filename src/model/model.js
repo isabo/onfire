@@ -319,6 +319,9 @@ onfire.model.Model.prototype.handleValue = function(newValue) {
 
     this.isLoaded = true; // Now the callback can call methods without triggering exceptions.
 
+    // TODO: re-evaluate whether we have any outstanding changes. This value may have come from
+    // somewhere else, and may render unnecessary some of our uncommitted changes.
+
     if (this.valueCallback) {
         this.valueCallback.call(null);
     }

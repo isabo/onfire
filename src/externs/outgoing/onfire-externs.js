@@ -5,6 +5,9 @@
  */
 
 
+var onfire = {};
+
+
 /**
  * An analogue of a Firebase reference.
  * @see https://www.firebase.com/docs/web/api/firebase/constructor.html
@@ -138,10 +141,7 @@ onfire.Ref.prototype.changePassword = function(credentials) {};
  * @return {!Promise<!{uid:string},!Error>|!goog.Promise<!{uid:string},!Error>} A promise which
  *      resolves to a userData object, or is rejected with an error.
  */
-onfire.Ref.prototype.createUser = function (credentials) {
-
-    return onfire.utils.firebase.createUser(this.ref_, credentials);
-};
+onfire.Ref.prototype.createUser = function (credentials) {};
 
 
 /**
@@ -435,6 +435,8 @@ onfire.defineModel = function(schema) {};
 
 
 
+
+onfire.model = {};
 
 /**
  * Base class to represent objects that live in Firebase.

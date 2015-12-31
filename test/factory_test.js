@@ -118,3 +118,20 @@ test('Uses pre-generated constructors for submodels', function (t) {
 
     t.end();
 });
+
+
+test('Model constructor exposes its schema', function (t) {
+
+    var schema = {
+        number: 'number',
+        string: 'string',
+        boolean: 'boolean'
+    };
+
+    var Model = onfire.defineModel(schema);
+
+    t.ok(typeof Model.getSchema === 'function', 'Has a getSchema() class method');
+    t.deepEqual(Model.getSchema(), schema, 'getSchema returns the correct schema');
+
+    t.end();
+});

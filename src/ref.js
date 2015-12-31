@@ -25,7 +25,13 @@ onfire.Ref = function(urlOrRef) {
      * @type {!Firebase}
      * @private
      */
-    this.ref_ = urlOrRef;
+    this.ref_ = urlOrRef.ref(); // For queries, this gets the ref that is the basis for the query.
+
+    /**
+     * @type {!Firebase.Query}
+     * @private
+     */
+    this.queryRef_ = urlOrRef; // For queries, this is the complete query, e.g. including the sortByChild etc.
 };
 
 
@@ -320,7 +326,7 @@ onfire.Ref.prototype.key = function() {
  */
 onfire.Ref.prototype.off = function(opt_eventType, opt_callback, opt_context) {
 
-    this.ref_.off(opt_eventType, opt_callback); // Because we wrap all callbacks, there is no context.
+    this.queryRef_.off(opt_eventType, opt_callback); // Because we wrap all callbacks, there is no context.
 };
 
 
@@ -374,7 +380,7 @@ onfire.Ref.prototype.on = function(eventType, callback, cancelCallback, context)
         }
     };
 
-    return this.ref_.on(eventType, cbWrapper, cancelWrapper);
+    return this.queryRef_.on(eventType, cbWrapper, cancelWrapper);
 };
 
 
@@ -393,7 +399,7 @@ onfire.Ref.prototype.once = function(eventType) {
     onfire.utils.logging.info('ONCE ' + eventType.toUpperCase() +  ' ' + this.path());
 
     var self = this;
-    return onfire.utils.firebase.once(this.ref_, eventType).
+    return onfire.utils.firebase.once(this.queryRef_, eventType).
         then(function(/** !Firebase.DataSnapshot */snapshot) {
             onfire.utils.logging.info('ONCE ' + eventType.toUpperCase() +  ' (Success) ' +
                 self.path(), snapshot.val());

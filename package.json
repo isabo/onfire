@@ -30,6 +30,7 @@
     "closure-compiler": "git://github.com/isabo/node-closure.git#allow-newer-compiler",
     "faucet": "0.0.1",
     "firebase-externs": "0.0.0",
+    "firebase-server": "^0.5.1",
     "fs-extra": "^0.26.2",
     "google-closure-compiler": "^20151015.0.0",
     "google-closure-library": "^20151015.0.0",

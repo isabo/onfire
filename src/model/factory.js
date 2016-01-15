@@ -116,11 +116,14 @@ onfire.model.factory.generateCollectionCtor_ = function(schema) {
     };
     goog.inherits(Collection, onfire.model.Collection);
 
-    // Expose the schema.
+    // Expose the schema and the member constructor.
     var schemaCopy = {};
     goog.object.extend(schemaCopy, schema);
     Collection['getSchema'] = function() {
         return schemaCopy;
+    };
+    Collection['getMemberCtor'] = function() {
+        return memberCtor;
     };
 
     return Collection;

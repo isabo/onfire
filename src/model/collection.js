@@ -375,9 +375,10 @@ onfire.model.Collection.prototype.forEach = function(callback) {
 
         var p = this.memberCtor_ ?
             this.fetch(key) : onfire.utils.promise.resolve(this.getBasicValue(key));
-        p = p.then(function(/** !onfire.model.Model|Firebase.Value */item) {
-                return callback.call(null, item, key);
-            });
+        p = p.then((function(/* string */key, /** !onfire.model.Model|Firebase.Value */item) {
+            return callback.call(null, item, key);
+        }).bind(null, key));
+        // ^ Bake the current key into the callback so it doesn't change by the time it is executed.
         promises.push(p);
     }
 

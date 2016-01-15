@@ -782,6 +782,15 @@ onfire.model.Collection.prototype.save;
 onfire.model.Collection.prototype.whenLoaded;
 
 
+/**
+ * Exposes the type of members in the collection. This is only exposed on generated models, and is
+ * dincluded here for ocumentation purposes only.
+ *
+ * @return {function(new:onfire.model.Model, !onfire.Ref)|undefined}
+ */
+onfire.model.Collection.getMemberCtor = function() {};
+
+
 
 
 /**

@@ -162,6 +162,7 @@ onfire.model.Model.prototype.configureInstance = function(schema) {
                 // A getter/setter has already been configured on the prototype.
                 break;
 
+            case onfire.model.schema.ValueType.CONSTRUCTOR:
             case onfire.model.schema.ValueType.MODEL:
             case onfire.model.schema.ValueType.COLLECTION:
 

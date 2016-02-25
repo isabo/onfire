@@ -1,6 +1,6 @@
 {
   "name": "onfire",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Models & Promises for Firebase",
   "main": "dist/onfire.min.js",
   "scripts": {
